@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Jewelry Inventory</h1>
+
+<br>
+
+<form method="GET">
+
+    <input
+    type="text"
+    name="search"
+    placeholder="Search RFID..."
+    style="padding:10px;width:300px;">
+
+    <button
+    style="
+    background:#D4AF37;
+    padding:10px 20px;
+    border:none;">
+    Search
+    </button>
+
+</form>
+
+<br>
+
+<table style="
+width:100%;
+background:white;
+border-collapse:collapse;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+">
+
+<tr style="background:#D4AF37;color:black;">
+
+<th style="padding:15px;">RFID</th>
+<th>Ornament</th>
+<th>Weight</th>
+<th>Purity</th>
+<th>Price</th>
+<th>Status</th>
+<th>Actions</th>
+<th>QR</th>
+
+</tr>
+
+{% for item in items %}
+
+<tr>
+
+<td style="padding:15px;">{{ item.rfid_id }}</td>
+<td>{{ item.ornament_name }}</td>
+<td>{{ item.weight }} g</td>
+<td>{{ item.purity }}</td>
+<td>₹{{ item.price }}</td>
+<td>{{ item.status }}</td>
+
+<td>
+
+<a href="/sold/{{ item.id }}"
+style="
+background:green;
+color:white;
+padding:5px 10px;
+text-decoration:none;
+border-radius:5px;">
+Sold
+</a>
+
+<a href="/delete/{{ item.id }}"
+style="
+background:red;
+color:white;
+padding:5px 10px;
+text-decoration:none;
+border-radius:5px;">
+Delete
+</a>
+<br><br>
+
+<a href="/print_qr/{{ item.id }}"
+style="
+background:#0d6efd;
+color:white;
+padding:5px 10px;
+text-decoration:none;
+border-radius:5px;
+">
+Print QR
+</a>
+
+<td>
+    <img
+    src="/static/qrcodes/{{ item.rfid_id }}.png"
+    width="70">
+</td>
+
+</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+{% endblock %}

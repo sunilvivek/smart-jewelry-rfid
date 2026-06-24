@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="card p-4">
+
+    <h2>Add Jewelry</h2>
+
+    <form method="POST">
+
+        <div class="mb-3">
+            <label>RFID ID</label>
+            <input type="text"
+                   class="form-control"
+                   name="rfid_id"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Ornament Name</label>
+            <input type="text"
+                   class="form-control"
+                   name="ornament_name"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Weight (grams)</label>
+            <input type="number"
+                   step="0.01"
+                   class="form-control"
+                   name="weight"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Purity</label>
+            <input type="text"
+                   class="form-control"
+                   name="purity"
+                   required>
+        </div>
+
+        <div class="mb-3">
+            <label>Price</label>
+            <input type="number"
+                   class="form-control"
+                   name="price"
+                   required>
+        </div>
+
+        <button class="btn gold-btn">
+            Save Jewelry
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}

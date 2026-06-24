@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="
+background:white;
+padding:40px;
+border-radius:20px;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+text-align:center;
+">
+
+<h1>Smart RFID Inventory System</h1>
+
+<p>
+Manage Jewelry Inventory, RFID Tracking and Billing
+</p>
+
+<br>
+
+<a href="/add"
+style="
+background:#D4AF37;
+padding:12px 25px;
+text-decoration:none;
+color:black;
+font-weight:bold;
+border-radius:10px;
+">
+Add Jewelry
+</a>
+
+<a href="/inventory"
+style="
+background:black;
+padding:12px 25px;
+text-decoration:none;
+color:white;
+font-weight:bold;
+border-radius:10px;
+margin-left:10px;
+">
+Inventory
+</a>
+
+<a href="/scan"
+style="
+background:#198754;
+padding:12px 25px;
+text-decoration:none;
+color:white;
+font-weight:bold;
+border-radius:10px;
+margin-left:10px;
+">
+RFID Scan
+</a>
+
+</div>
+
+<br><br>
+
+<div style="display:flex;gap:20px;">
+
+<div style="
+background:white;
+padding:20px;
+border-radius:15px;
+flex:1;
+text-align:center;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+">
+
+<h3>Total Items</h3>
+
+<h1>{{ total_items }}</h1>
+
+</div>
+
+<div style="
+background:white;
+padding:20px;
+border-radius:15px;
+flex:1;
+text-align:center;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+">
+
+<h3>Total Weight</h3>
+
+<h1>{{ total_weight }} g</h1>
+
+</div>
+
+<div style="
+background:white;
+padding:20px;
+border-radius:15px;
+flex:1;
+text-align:center;
+box-shadow:0 4px 15px rgba(0,0,0,0.1);
+">
+
+<h3>Inventory Value</h3>
+
+<h1>₹{{ total_value }}</h1>
+
+</div>
+
+</div>
+
+{% endblock %}

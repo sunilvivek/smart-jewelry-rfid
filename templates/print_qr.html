@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Print QR</title>
+
+<style>
+
+body{
+    font-family:Arial;
+    text-align:center;
+}
+
+.label{
+    width:350px;
+    margin:auto;
+    border:2px solid black;
+    padding:20px;
+}
+
+h2{
+    color:#D4AF37;
+}
+
+button{
+    margin-top:20px;
+    padding:10px 20px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="label">
+
+<h2>💎 BALAJI JEWELLERS</h2>
+
+<img
+src="/static/qrcodes/{{ item.rfid_id }}.png"
+width="200">
+
+<h3>{{ item.ornament_name }}</h3>
+
+<p><b>{{ item.rfid_id }}</b></p>
+
+<p>
+{{ item.purity }}
+|
+{{ item.weight }} g
+</p>
+
+</div>
+
+<br>
+
+<button onclick="window.print()">
+🖨️ Print Tag
+</button>
+
+</body>
+
+</html>
