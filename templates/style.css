@@ -1,0 +1,27 @@
+body{
+    background: linear-gradient(135deg,#f8f9fa,#ececec);
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.navbar{
+    background:#111;
+    box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+
+.brand{
+    color:#D4AF37;
+    font-size:32px;
+    font-weight:700;
+}
+
+.card{
+    border:none;
+    border-radius:20px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.1);
+}
+
+.gold-btn{
+    background:#D4AF37;
+    color:black;
+    font-weight:bold;
+}

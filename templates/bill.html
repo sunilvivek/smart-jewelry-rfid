@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Invoice</h1>
+
+<h3>{{ item.ornament_name }}</h3>
+
+<p>RFID: {{ item.rfid_id }}</p>
+
+<p>Weight: {{ item.weight }} g</p>
+
+<p>Purity: {{ item.purity }}</p>
+
+<p>Price: ₹{{ item.price }}</p>
+
+{% endblock %}

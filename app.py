@@ -3,11 +3,34 @@ from flask_sqlalchemy import SQLAlchemy
 import qrcode
 import os
 
+
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user
+)
 app = Flask(__name__)
+app.config["SECRET_KEY"] = "balaji_jewellers_secret_2026"
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///jewelry.db'
 
 db = SQLAlchemy(app)
+
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
+
+class Admin(UserMixin, db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    username = db.Column(db.String(100), unique=True, nullable=False)
+
+    password = db.Column(db.String(255), nullable=False)
 
 class Jewelry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -18,7 +41,41 @@ class Jewelry(db.Model):
     price = db.Column(db.Float)
     status = db.Column(db.String(20))
 
-@app.route('/')
+@login_manager.user_loader
+def load_user(user_id):
+    return db.session.get(Admin, int(user_id))
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+
+    if current_user.is_authenticated:
+        return redirect("/")
+
+    if request.method == "POST":
+
+        username = request.form["username"]
+        password = request.form["password"]
+
+        admin = Admin.query.filter_by(username=username).first()
+
+        if admin and check_password_hash(admin.password, password):
+            login_user(admin)
+            return redirect("/")
+
+        return "Invalid Username or Password"
+
+    return render_template("login.html")
+
+@app.route("/logout")
+@login_required
+def logout():
+
+    logout_user()
+
+    return redirect("/login")
+
+@app.route("/")
+@login_required
 def home():
 
     items = Jewelry.query.all()
@@ -42,6 +99,7 @@ def home():
         available_stock=available_stock
     )
 @app.route('/add', methods=['GET', 'POST'])
+@login_required
 def add_jewelry():
 
     if request.method == 'POST':
@@ -73,6 +131,7 @@ def add_jewelry():
     return render_template('add_jewelry.html')
 
 @app.route('/inventory')
+@login_required
 def inventory():
 
     search = request.args.get('search')
@@ -93,6 +152,7 @@ def inventory():
     )
     
 @app.route('/scan', methods=['GET', 'POST'])
+@login_required
 def scan():
 
     item = None
@@ -111,6 +171,7 @@ def scan():
     )
 
 @app.route('/delete/<int:id>')
+@login_required
 def delete_item(id):
 
     item = Jewelry.query.get(id)
@@ -126,6 +187,7 @@ def delete_item(id):
     return redirect('/inventory')
 
 @app.route('/sold/<int:id>')
+@login_required
 def mark_sold(id):
 
     item = Jewelry.query.get(id)
@@ -137,6 +199,7 @@ def mark_sold(id):
     return redirect('/inventory')
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit_item(id):
 
     item = Jewelry.query.get_or_404(id)
@@ -188,7 +251,21 @@ def items():
 
 
 if __name__ == "__main__":
+
     with app.app_context():
+
         db.create_all()
+
+        if not Admin.query.filter_by(username="admin").first():
+
+            admin = Admin(
+                username="admin",
+                password=generate_password_hash("balaji123")
+            )
+
+            db.session.add(admin)
+            db.session.commit()
+
+            print("✅ Default Admin Created")
 
     app.run(debug=True, port=8000)

@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Edit Jewelry</h1>
+
+<form method="POST">
+
+<label>Name</label>
+<input type="text"
+name="ornament_name"
+value="{{ item.ornament_name }}">
+
+<br><br>
+
+<label>Weight</label>
+<input type="number"
+step="0.01"
+name="weight"
+value="{{ item.weight }}">
+
+<br><br>
+
+<label>Purity</label>
+<input type="text"
+name="purity"
+value="{{ item.purity }}">
+
+<br><br>
+
+<label>Price</label>
+<input type="number"
+name="price"
+value="{{ item.price }}">
+
+<br><br>
+
+<label>Status</label>
+
+<select name="status">
+    <option>Available</option>
+    <option>Sold</option>
+</select>
+
+<br><br>
+
+<button type="submit">
+Update Item
+</button>
+
+</form>
+
+{% endblock %}
