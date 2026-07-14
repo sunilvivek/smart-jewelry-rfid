@@ -2,90 +2,70 @@
 
 {% block content %}
 
-<div style="
-background:white;
-padding:40px;
-border-radius:20px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h1>RFID Scanner</h1>
-
-<form method="POST">
-
-<input
-type="text"
-name="rfid_id"
-placeholder="Enter RFID ID"
-style="
-width:100%;
-padding:15px;
-font-size:18px;
-margin-top:20px;
-"
-required>
-
-<br><br>
-
-<button
-style="
-background:#D4AF37;
-padding:12px 25px;
-border:none;
-font-weight:bold;
-border-radius:10px;
-">
-Scan RFID
-</button>
-
-</form>
-
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-upc-scan"></i> RFID Scanner</h1>
+    <p>Scan or enter an RFID ID to look up jewelry details</p>
 </div>
 
-<!-- REPLACE ONLY THIS PART -->
-{% if item %}
+<div class="scanner-card animate-fade-in-delay-1">
+    <form method="POST">
+        <div class="scanner-input-group">
+            <input type="text" name="rfid_id" placeholder="Enter RFID ID..." required>
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-search"></i> Scan RFID
+            </button>
+        </div>
+    </form>
 
-<br>
-
-<div style="
-background:white;
-padding:30px;
-border-radius:20px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h2 style="color:#D4AF37;">
-💎 {{ item.ornament_name }}
-</h2>
-
-<img
-src="/static/qrcodes/{{ item.rfid_id }}.png"
-width="150">
-
-<br><br>
-
-<p><b>RFID:</b> {{ item.rfid_id }}</p>
-<p><b>Weight:</b> {{ item.weight }} g</p>
-<p><b>Purity:</b> {{ item.purity }}</p>
-<p><b>Price:</b> ₹{{ item.price }}</p>
-
-<p>
-<b>Status:</b>
-
-{% if item.status == "Available" %}
-<span style="background:green;color:white;padding:5px 10px;border-radius:10px;">
-Available
-</span>
-{% else %}
-<span style="background:red;color:white;padding:5px 10px;border-radius:10px;">
-Sold
-</span>
-{% endif %}
-
-</p>
+    {% if item %}
+    <div class="scan-result">
+        <div class="scan-result-card">
+            <div class="scan-result-header">
+                <i class="bi bi-gem"></i>
+                <h2>{{ item.ornament_name }}</h2>
+            </div>
+            <div class="scan-result-body">
+                <div class="scan-result-qr">
+                    <img src="/static/qrcodes/{{ item.rfid_id }}.png" alt="QR Code for {{ item.rfid_id }}">
+                </div>
+                <div class="scan-result-details">
+                    <div class="scan-detail-row">
+                        <i class="bi bi-upc"></i>
+                        <span class="scan-detail-label">RFID</span>
+                        <span class="scan-detail-value">{{ item.rfid_id }}</span>
+                    </div>
+                    <div class="scan-detail-row">
+                        <i class="bi bi-speedometer"></i>
+                        <span class="scan-detail-label">Weight</span>
+                        <span class="scan-detail-value">{{ item.weight }} g</span>
+                    </div>
+                    <div class="scan-detail-row">
+                        <i class="bi bi-diamond"></i>
+                        <span class="scan-detail-label">Purity</span>
+                        <span class="scan-detail-value">{{ item.purity }}</span>
+                    </div>
+                    <div class="scan-detail-row">
+                        <i class="bi bi-currency-rupee"></i>
+                        <span class="scan-detail-label">Price</span>
+                        <span class="scan-detail-value">&#8377;{{ item.price }}</span>
+                    </div>
+                    <div class="scan-detail-row">
+                        <i class="bi bi-info-circle"></i>
+                        <span class="scan-detail-label">Status</span>
+                        <span class="scan-detail-value">
+                            {% if item.status == "Available" %}
+                            <span class="badge badge-available"><i class="bi bi-check-circle-fill"></i> Available</span>
+                            {% else %}
+                            <span class="badge badge-sold"><i class="bi bi-x-circle-fill"></i> Sold</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
 </div>
-
-{% endif %}
 
 {% endblock %}

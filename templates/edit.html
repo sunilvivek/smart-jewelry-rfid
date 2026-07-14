@@ -2,52 +2,45 @@
 
 {% block content %}
 
-<h1>Edit Jewelry</h1>
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-pencil-square"></i> Edit Jewelry</h1>
+    <p>Update details for {{ item.ornament_name }}</p>
+</div>
 
-<form method="POST">
-
-<label>Name</label>
-<input type="text"
-name="ornament_name"
-value="{{ item.ornament_name }}">
-
-<br><br>
-
-<label>Weight</label>
-<input type="number"
-step="0.01"
-name="weight"
-value="{{ item.weight }}">
-
-<br><br>
-
-<label>Purity</label>
-<input type="text"
-name="purity"
-value="{{ item.purity }}">
-
-<br><br>
-
-<label>Price</label>
-<input type="number"
-name="price"
-value="{{ item.price }}">
-
-<br><br>
-
-<label>Status</label>
-
-<select name="status">
-    <option>Available</option>
-    <option>Sold</option>
-</select>
-
-<br><br>
-
-<button type="submit">
-Update Item
-</button>
-
-</form>
+<div class="card card-p-4 form-section animate-fade-in-delay-1">
+    <form method="POST">
+        <div class="form-group">
+            <label><i class="bi bi-tag"></i> Ornament Name</label>
+            <input type="text" class="form-control" name="ornament_name" value="{{ item.ornament_name }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-speedometer"></i> Weight (grams)</label>
+            <input type="number" step="0.01" class="form-control" name="weight" value="{{ item.weight }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-diamond"></i> Purity</label>
+            <input type="text" class="form-control" name="purity" value="{{ item.purity }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-currency-rupee"></i> Price</label>
+            <input type="number" class="form-control" name="price" value="{{ item.price }}" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-info-circle"></i> Status</label>
+            <select name="status" class="form-control">
+                <option {% if item.status == "Available" %}selected{% endif %}>Available</option>
+                <option {% if item.status == "Sold" %}selected{% endif %}>Sold</option>
+            </select>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Update Item
+            </button>
+            <a href="/inventory" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
 
 {% endblock %}

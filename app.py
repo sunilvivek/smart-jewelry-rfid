@@ -170,7 +170,7 @@ def scan():
         item=item
     )
 
-@app.route('/delete/<int:id>')
+@app.route('/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_item(id):
 
@@ -186,7 +186,7 @@ def delete_item(id):
 
     return redirect('/inventory')
 
-@app.route('/sold/<int:id>')
+@app.route('/sold/<int:id>', methods=['POST'])
 @login_required
 def mark_sold(id):
 
@@ -221,6 +221,7 @@ def edit_item(id):
         item=item
     )
 @app.route('/generate_all_qr')
+@login_required
 def generate_all_qr():
 
     items = Jewelry.query.all()
@@ -242,13 +243,26 @@ def print_qr(id):
     )
 
 @app.route('/test123')
+@login_required
 def test123():
     return "ROUTE WORKING"
 @app.route('/items')
+@login_required
 def items():
     all_items = Jewelry.query.all()
     return str([(i.id, i.rfid_id) for i in all_items])
 
+
+@app.route('/bill/<int:id>')
+@login_required
+def bill(id):
+
+    item = Jewelry.query.get_or_404(id)
+
+    return render_template(
+        'bill.html',
+        item=item
+    )
 
 if __name__ == "__main__":
 

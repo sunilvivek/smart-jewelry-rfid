@@ -2,16 +2,50 @@
 
 {% block content %}
 
-<h1>Invoice</h1>
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-receipt"></i> Invoice</h1>
+    <p>Transaction details for {{ item.ornament_name }}</p>
+</div>
 
-<h3>{{ item.ornament_name }}</h3>
+<div class="invoice-card animate-fade-in-delay-1">
+    <div class="invoice-header">
+        <h1><i class="bi bi-gem"></i> BALAJI JEWELLERS</h1>
+        <p>Invoice</p>
+    </div>
+    <div class="invoice-body">
+        <div class="invoice-item-name">{{ item.ornament_name }}</div>
 
-<p>RFID: {{ item.rfid_id }}</p>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-upc"></i> RFID ID</span>
+            <span class="invoice-row-value">{{ item.rfid_id }}</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-speedometer"></i> Weight</span>
+            <span class="invoice-row-value">{{ item.weight }} g</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-diamond"></i> Purity</span>
+            <span class="invoice-row-value">{{ item.purity }}</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-info-circle"></i> Status</span>
+            <span class="invoice-row-value">
+                {% if item.status == "Available" %}
+                <span class="badge badge-available"><i class="bi bi-check-circle-fill"></i> Available</span>
+                {% else %}
+                <span class="badge badge-sold"><i class="bi bi-x-circle-fill"></i> Sold</span>
+                {% endif %}
+            </span>
+        </div>
 
-<p>Weight: {{ item.weight }} g</p>
-
-<p>Purity: {{ item.purity }}</p>
-
-<p>Price: ₹{{ item.price }}</p>
+        <div class="invoice-total">
+            <span class="invoice-total-label"><i class="bi bi-currency-rupee"></i> Total Amount</span>
+            <span class="invoice-total-value">&#8377;{{ item.price }}</span>
+        </div>
+    </div>
+    <div class="invoice-footer">
+        This is a system-generated invoice from Balaji Jewellers RFID Inventory System.
+    </div>
+</div>
 
 {% endblock %}

@@ -1,117 +1,108 @@
-
 {% extends 'base.html' %}
 
 {% block content %}
 
-<h1>Jewelry Inventory</h1>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 animate-fade-in">
+    <div>
+        <h1><i class="bi bi-box-seam"></i> Jewelry Inventory</h1>
+        <p>Manage and track all jewelry items</p>
+    </div>
+    <div class="item-count">
+        <strong>{{ items|length }}</strong> item{{ 's' if items|length != 1 }} found
+    </div>
+</div>
 
-<br>
+<div class="search-wrapper mb-4 animate-fade-in-delay-1">
+    <form method="GET" class="search-wrapper" style="width:100%;">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" placeholder="Search by RFID ID...">
+        </div>
+        <button type="submit" class="btn-gold">
+            <i class="bi bi-search"></i> Search
+        </button>
+        {% if request.args.get('search') %}
+        <a href="/inventory" class="btn-outline-gold">
+            <i class="bi bi-x-lg"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
 
-<form method="GET" class="mb-4">
-
-    <input
-type="text"
-name="search"
-placeholder="🔍 Search RFID..."
-class="search-box">
-
-    <button class="gold-btn">
-        Search
-    </button>
-
-</form>
-
-<table>
-
-    <tr>
-
-        <th>RFID</th>
-        <th>Ornament</th>
-        <th>Weight</th>
-        <th>Purity</th>
-        <th>Price</th>
-        <th>Status</th>
-        <th style="text-align:center;">QR</th>
-        <th style="text-align:center;">Actions</th>
-
-    </tr>
-
-    {% for item in items %}
-
-    <tr>
-
-        <td>{{ item.rfid_id }}</td>
-
-        <td>{{ item.ornament_name }}</td>
-
-        <td>{{ item.weight }} g</td>
-
-        <td>{{ item.purity }}</td>
-
-        <td>₹{{ "{:,.0f}".format(item.price) }}</td>
-
-        <td>
-
-            {% if item.status == "Available" %}
-
-                <span class="status-available">
-                    Available
-                </span>
-
-            {% else %}
-
-                <span class="status-sold">
-                    Sold
-                </span>
-
-            {% endif %}
-
-        </td>
-
-        <td style="text-align:center;">
-
-            <img
-                src="/static/qrcodes/{{ item.rfid_id }}.png"
-                width="70"
-                style="border-radius:8px;">
-
-            <br><br>
-
-            <a href="/print_qr/{{ item.id }}"
-               class="print-btn">
-                🖨 Print
-            </a>
-
-        </td>
-
-        <td class="actions">
-
-            <a href="/edit/{{ item.id }}"
-               class="action-btn edit-btn"
-               title="Edit">
-                ✏️
-            </a>
-
-            <a href="/sold/{{ item.id }}"
-               class="action-btn sold-btn"
-               title="Mark Sold">
-                ✔
-            </a>
-
-            <a href="/delete/{{ item.id }}"
-               class="action-btn delete-btn"
-               title="Delete"
-               onclick="return confirm('Delete this jewelry item?');">
-                🗑
-            </a>
-
-        </td>
-
-    </tr>
-
-    {% endfor %}
-
-</table>
+<div class="table-wrapper animate-fade-in-delay-2">
+    {% if items %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="bi bi-upc"></i> RFID</th>
+                    <th><i class="bi bi-tag"></i> Ornament</th>
+                    <th><i class="bi bi-speedometer"></i> Weight</th>
+                    <th><i class="bi bi-diamond"></i> Purity</th>
+                    <th><i class="bi bi-currency-rupee"></i> Price</th>
+                    <th><i class="bi bi-info-circle"></i> Status</th>
+                    <th><i class="bi bi-qr-code"></i> QR</th>
+                    <th><i class="bi bi-gear"></i> Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in items %}
+                <tr>
+                    <td><strong>{{ item.rfid_id }}</strong></td>
+                    <td>{{ item.ornament_name }}</td>
+                    <td>{{ item.weight }} g</td>
+                    <td>{{ item.purity }}</td>
+                    <td>&#8377;{{ "{:,.0f}".format(item.price) }}</td>
+                    <td>
+                        {% if item.status == "Available" %}
+                        <span class="badge badge-available"><i class="bi bi-check-circle-fill"></i> Available</span>
+                        {% else %}
+                        <span class="badge badge-sold"><i class="bi bi-x-circle-fill"></i> Sold</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div class="qr-cell">
+                            <img src="/static/qrcodes/{{ item.rfid_id }}.png" alt="QR {{ item.rfid_id }}" class="qr-thumb">
+                            <a href="/print_qr/{{ item.id }}" class="action-btn action-btn-print" title="Print QR">
+                                <i class="bi bi-printer"></i>
+                            </a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="/edit/{{ item.id }}" class="action-btn action-btn-edit" title="Edit">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="/bill/{{ item.id }}" class="action-btn action-btn-bill" title="Bill">
+                                <i class="bi bi-receipt"></i>
+                            </a>
+                            <form method="POST" action="/sold/{{ item.id }}" style="display:inline;">
+                                <button type="submit" class="action-btn action-btn-sold" title="Mark Sold">
+                                    <i class="bi bi-check-lg"></i>
+                                </button>
+                            </form>
+                            <form method="POST" action="/delete/{{ item.id }}" style="display:inline;">
+                                <button type="submit" class="action-btn action-btn-delete" title="Delete" onclick="return confirm('Delete this jewelry item?');">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="table-empty">
+        <i class="bi bi-inbox"></i>
+        <h3>No Jewelry Items Found</h3>
+        <p>{% if request.args.get('search') %}No items match your search. Try a different RFID ID.{% else %}Your inventory is empty. Start by adding jewelry items.{% endif %}</p>
+        <a href="/add" class="btn-gold mt-3" style="margin-top:20px;">
+            <i class="bi bi-plus-circle"></i> Add First Item
+        </a>
+    </div>
+    {% endif %}
+</div>
 
 {% endblock %}
-```

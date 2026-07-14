@@ -2,43 +2,42 @@
 
 {% block content %}
 
-<div class="card p-4">
-
-<h2>Add Jewelry</h2>
-
-<form method="POST">
-
-<div class="mb-3">
-<label>RFID ID</label>
-<input type="text" class="form-control" name="rfid_id" required>
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-plus-circle"></i> Add Jewelry</h1>
+    <p>Add a new jewelry item to inventory with RFID tracking</p>
 </div>
 
-<div class="mb-3">
-<label>Ornament Name</label>
-<input type="text" class="form-control" name="ornament_name" required>
-</div>
-
-<div class="mb-3">
-<label>Weight</label>
-<input type="number" step="0.01" class="form-control" name="weight" required>
-</div>
-
-<div class="mb-3">
-<label>Purity</label>
-<input type="text" class="form-control" name="purity" required>
-</div>
-
-<div class="mb-3">
-<label>Price</label>
-<input type="number" class="form-control" name="price" required>
-</div>
-
-<button class="btn gold-btn">
-Save Jewelry
-</button>
-
-</form>
-
+<div class="card card-p-4 form-section animate-fade-in-delay-1">
+    <form method="POST">
+        <div class="form-group">
+            <label><i class="bi bi-upc"></i> RFID ID</label>
+            <input type="text" class="form-control" name="rfid_id" placeholder="e.g. RFID001" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-tag"></i> Ornament Name</label>
+            <input type="text" class="form-control" name="ornament_name" placeholder="e.g. Gold Necklace" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-speedometer"></i> Weight (grams)</label>
+            <input type="number" step="0.01" class="form-control" name="weight" placeholder="e.g. 45.5" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-diamond"></i> Purity</label>
+            <input type="text" class="form-control" name="purity" placeholder="e.g. 22K, 916, Silver 925" required>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-currency-rupee"></i> Price</label>
+            <input type="number" class="form-control" name="price" placeholder="e.g. 125000" required>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Save Jewelry
+            </button>
+            <a href="/inventory" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
 </div>
 
 {% endblock %}

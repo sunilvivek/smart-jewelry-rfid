@@ -2,126 +2,46 @@
 
 {% block content %}
 
-<div style="
-background:white;
-padding:40px;
-border-radius:20px;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-text-align:center;
-">
-
-<h1>Smart RFID Inventory System</h1>
-
-<p>
-Manage Jewelry Inventory, RFID Tracking and Billing
-</p>
-
-<br>
-
-<a href="/add"
-style="
-background:#D4AF37;
-padding:12px 25px;
-text-decoration:none;
-color:black;
-font-weight:bold;
-border-radius:10px;
-">
-Add Jewelry
-</a>
-
-<a href="/inventory"
-style="
-background:black;
-padding:12px 25px;
-text-decoration:none;
-color:white;
-font-weight:bold;
-border-radius:10px;
-margin-left:10px;
-">
-Inventory
-</a>
-
-<a href="/scan"
-style="
-background:#198754;
-padding:12px 25px;
-text-decoration:none;
-color:white;
-font-weight:bold;
-border-radius:10px;
-margin-left:10px;
-">
-RFID Scan
-</a>
-
+<div class="hero-card animate-fade-in">
+    <h1><i class="bi bi-gem"></i> Smart RFID Inventory System</h1>
+    <p>Manage Jewelry Inventory, RFID Tracking &amp; Billing</p>
+    <div class="action-grid">
+        <a href="/add" class="action-card action-card-gold">
+            <i class="bi bi-plus-circle"></i>
+            Add Jewelry
+        </a>
+        <a href="/inventory" class="action-card action-card-dark">
+            <i class="bi bi-box-seam"></i>
+            Inventory
+        </a>
+        <a href="/scan" class="action-card action-card-green">
+            <i class="bi bi-upc-scan"></i>
+            RFID Scan
+        </a>
+    </div>
 </div>
 
-<br><br>
-
-<div style="display:flex;gap:20px;">
-
-<div style="
-background:white;
-padding:20px;
-border-radius:15px;
-flex:1;
-text-align:center;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h3>Total Items</h3>
-
-<h1>{{ total_items }}</h1>
-
-</div>
-
-<div style="
-background:white;
-padding:20px;
-border-radius:15px;
-flex:1;
-text-align:center;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h3>Total Weight</h3>
-
-<h1>{{ total_weight }} g</h1>
-
-</div>
-
-<div style="
-background:white;
-padding:20px;
-border-radius:15px;
-flex:1;
-text-align:center;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h3>Inventory Value</h3>
-
-<h1>₹{{ total_value }}</h1>
-
-<div style="
-background:white;
-padding:20px;
-border-radius:15px;
-flex:1;
-text-align:center;
-box-shadow:0 4px 15px rgba(0,0,0,0.1);
-">
-
-<h3>Available Stock</h3>
-
-<h1>{{ available_stock }}</h1>
-
-</div>
-
-</div>
-
+<div class="stats-grid mt-3 animate-fade-in-delay-2">
+    <div class="stat-card">
+        <i class="bi bi-box-seam"></i>
+        <h3>Total Items</h3>
+        <div class="stat-value">{{ total_items }}</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-speedometer"></i>
+        <h3>Total Weight</h3>
+        <div class="stat-value">{{ total_weight }} <span class="stat-unit">g</span></div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-currency-rupee"></i>
+        <h3>Inventory Value</h3>
+        <div class="stat-value">&#8377;{{ total_value }}</div>
+    </div>
+    <div class="stat-card">
+        <i class="bi bi-check-circle"></i>
+        <h3>Available Stock</h3>
+        <div class="stat-value">{{ available_stock }}</div>
+    </div>
 </div>
 
 {% endblock %}
