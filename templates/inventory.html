@@ -4,25 +4,59 @@
 
 <div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 animate-fade-in">
     <div>
-        <h1><i class="bi bi-box-seam"></i> Jewelry Inventory</h1>
-        <p>Manage and track all jewelry items</p>
+        <h1><i class="bi bi-box-seam"></i>
+            {% if active_filter == "Gold" %}
+            Gold Inventory
+            {% elif active_filter == "Silver" %}
+            Silver Inventory
+            {% else %}
+            All Jewelry
+            {% endif %}
+        </h1>
+        <p>
+            {% if active_filter == "Gold" %}
+            Showing all Gold jewelry items
+            {% elif active_filter == "Silver" %}
+            Showing all Silver jewelry items
+            {% else %}
+            Manage and track all jewelry items
+            {% endif %}
+        </p>
     </div>
     <div class="item-count">
         <strong>{{ items|length }}</strong> item{{ 's' if items|length != 1 }} found
     </div>
 </div>
 
+<div class="filter-tabs animate-fade-in-delay-1">
+    <a href="/inventory"
+       class="filter-tab {% if not active_filter %}active{% endif %}">
+        <i class="bi bi-grid-3x3-gap"></i> All
+    </a>
+    <a href="/inventory/gold"
+       class="filter-tab filter-tab-gold {% if active_filter == 'Gold' %}active{% endif %}">
+        <i class="bi bi-circle-fill"></i> Gold
+    </a>
+    <a href="/inventory/silver"
+       class="filter-tab filter-tab-silver {% if active_filter == 'Silver' %}active{% endif %}">
+        <i class="bi bi-circle-fill"></i> Silver
+    </a>
+</div>
+
 <div class="search-wrapper mb-4 animate-fade-in-delay-1">
     <form method="GET" class="search-wrapper" style="width:100%;">
+        {% if active_filter %}
+        <input type="hidden" name="metal" value="{{ active_filter }}">
+        {% endif %}
         <div class="search-box">
             <i class="bi bi-search"></i>
-            <input type="text" name="search" placeholder="Search by RFID ID...">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by RFID, name, metal, status...">
         </div>
         <button type="submit" class="btn-gold">
             <i class="bi bi-search"></i> Search
         </button>
-        {% if request.args.get('search') %}
-        <a href="/inventory" class="btn-outline-gold">
+        {% if search_query %}
+        <a href="{% if active_filter %}/inventory?metal={{ active_filter }}{% else %}/inventory{% endif %}" class="btn-outline-gold">
             <i class="bi bi-x-lg"></i> Clear
         </a>
         {% endif %}
@@ -37,6 +71,7 @@
                 <tr>
                     <th><i class="bi bi-upc"></i> RFID</th>
                     <th><i class="bi bi-tag"></i> Ornament</th>
+                    <th><i class="bi bi-circle-fill"></i> Metal</th>
                     <th><i class="bi bi-speedometer"></i> Weight</th>
                     <th><i class="bi bi-diamond"></i> Purity</th>
                     <th><i class="bi bi-currency-rupee"></i> Price</th>
@@ -50,6 +85,13 @@
                 <tr>
                     <td><strong>{{ item.rfid_id }}</strong></td>
                     <td>{{ item.ornament_name }}</td>
+                    <td>
+                        {% if item.metal_type == "Gold" %}
+                        <span class="badge badge-gold"><i class="bi bi-circle-fill"></i> Gold</span>
+                        {% else %}
+                        <span class="badge badge-silver"><i class="bi bi-circle-fill"></i> Silver</span>
+                        {% endif %}
+                    </td>
                     <td>{{ item.weight }} g</td>
                     <td>{{ item.purity }}</td>
                     <td>&#8377;{{ "{:,.0f}".format(item.price) }}</td>
@@ -97,7 +139,15 @@
     <div class="table-empty">
         <i class="bi bi-inbox"></i>
         <h3>No Jewelry Items Found</h3>
-        <p>{% if request.args.get('search') %}No items match your search. Try a different RFID ID.{% else %}Your inventory is empty. Start by adding jewelry items.{% endif %}</p>
+        <p>
+            {% if search_query %}
+            No items match your search. Try different keywords.
+            {% elif active_filter %}
+            No {{ active_filter|lower }} items in inventory yet.
+            {% else %}
+            Your inventory is empty. Start by adding jewelry items.
+            {% endif %}
+        </p>
         <a href="/add" class="btn-gold mt-3" style="margin-top:20px;">
             <i class="bi bi-plus-circle"></i> Add First Item
         </a>

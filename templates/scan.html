@@ -20,9 +20,14 @@
     {% if item %}
     <div class="scan-result">
         <div class="scan-result-card">
-            <div class="scan-result-header">
+            <div class="scan-result-header {% if item.metal_type == 'Silver' %}scan-result-header-silver{% endif %}">
                 <i class="bi bi-gem"></i>
                 <h2>{{ item.ornament_name }}</h2>
+                {% if item.metal_type == "Gold" %}
+                <span class="badge badge-gold" style="margin-left:auto;"><i class="bi bi-circle-fill"></i> Gold</span>
+                {% else %}
+                <span class="badge badge-silver" style="margin-left:auto;"><i class="bi bi-circle-fill"></i> Silver</span>
+                {% endif %}
             </div>
             <div class="scan-result-body">
                 <div class="scan-result-qr">
@@ -33,6 +38,11 @@
                         <i class="bi bi-upc"></i>
                         <span class="scan-detail-label">RFID</span>
                         <span class="scan-detail-value">{{ item.rfid_id }}</span>
+                    </div>
+                    <div class="scan-detail-row">
+                        <i class="bi bi-circle-fill {% if item.metal_type == 'Gold' %}text-gold{% else %}text-silver{% endif %}"></i>
+                        <span class="scan-detail-label">Metal</span>
+                        <span class="scan-detail-value">{{ item.metal_type }}</span>
                     </div>
                     <div class="scan-detail-row">
                         <i class="bi bi-speedometer"></i>

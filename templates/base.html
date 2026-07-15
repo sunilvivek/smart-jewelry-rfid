@@ -16,10 +16,19 @@
 <body>
 
     <nav class="navbar-custom">
-        <a href="/" class="brand">
-            <i class="bi bi-gem"></i>
-            BALAJI JEWELLERS
-        </a>
+        <div class="navbar-left">
+            <a href="/" class="brand">
+                <i class="bi bi-gem"></i>
+                BALAJI JEWELLERS
+            </a>
+            <ul class="navbar-nav">
+                <li><a href="/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/inventory/gold"><i class="bi bi-circle-fill" style="color:var(--gold);"></i> Gold</a></li>
+                <li><a href="/inventory/silver"><i class="bi bi-circle-fill" style="color:var(--silver);"></i> Silver</a></li>
+                <li><a href="/add"><i class="bi bi-plus-circle"></i> Add</a></li>
+                <li><a href="/scan"><i class="bi bi-upc-scan"></i> Scan</a></li>
+            </ul>
+        </div>
         <a href="/logout" class="logout-btn">
             <i class="bi bi-box-arrow-right"></i> Logout
         </a>

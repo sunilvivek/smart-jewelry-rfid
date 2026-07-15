@@ -20,6 +20,10 @@
     --gray-400: #9e9a92;
     --gray-500: #6b6860;
     --gray-600: #4a4840;
+    --silver: #8e8e93;
+    --silver-light: #d1d1d6;
+    --silver-dark: #636366;
+    --silver-glow: rgba(142, 142, 147, 0.25);
     --green: #2d8a4e;
     --green-light: #d4edda;
     --red: #c0392b;
@@ -147,6 +151,43 @@ body {
 
 .brand i {
     font-size: 20px;
+}
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.navbar-nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    list-style: none;
+}
+
+.navbar-nav a {
+    color: var(--gray-400);
+    text-decoration: none;
+    padding: 8px 14px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.navbar-nav a:hover {
+    color: var(--white);
+    background: var(--black-muted);
+}
+
+.navbar-nav a.active {
+    color: var(--gold);
+    background: rgba(201,168,76,0.1);
 }
 
 .logout-btn {
@@ -360,6 +401,17 @@ body {
     box-shadow: 0 4px 20px rgba(45,138,78,0.3);
 }
 
+.action-card-silver {
+    background: linear-gradient(135deg, var(--silver), var(--silver-dark));
+    color: var(--white);
+}
+
+.action-card-silver:hover {
+    background: var(--silver-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 20px rgba(142,142,147,0.3);
+}
+
 /* ---------- Stat Cards ---------- */
 .stats-grid {
     display: grid;
@@ -428,6 +480,38 @@ body {
     font-size: 16px;
     font-weight: 400;
     color: var(--gray-500);
+}
+
+/* ---------- Stat Cards - Metal Variants ---------- */
+.stat-card-gold {
+    border-left: 3px solid var(--gold);
+}
+
+.stat-card-gold::after {
+    background: var(--gold);
+}
+
+.stat-card-gold i {
+    color: var(--gold);
+}
+
+.stat-card-silver {
+    border-left: 3px solid var(--silver);
+}
+
+.stat-card-silver::after {
+    background: var(--silver);
+}
+
+.stat-card-silver i {
+    color: var(--silver);
+}
+
+/* ---------- Stats Grid 3-Column ---------- */
+.stats-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
 }
 
 /* ---------- Buttons ---------- */
@@ -749,6 +833,96 @@ tbody tr:nth-child(even):hover {
     color: var(--red);
 }
 
+/* ---------- Metal Badges ---------- */
+.badge-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #fdf6e3, #f5e6b8);
+    color: var(--gold-dark);
+    border: 1px solid rgba(201,168,76,0.3);
+}
+
+.badge-silver {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, #f5f5f5, #e8e8ea);
+    color: var(--silver-dark);
+    border: 1px solid rgba(142,142,147,0.3);
+}
+
+/* ---------- Filter Tabs ---------- */
+.filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: var(--transition);
+    border: 2px solid var(--gray-200);
+    background: var(--white);
+    color: var(--gray-500);
+}
+
+.filter-tab:hover {
+    border-color: var(--gray-300);
+    color: var(--black);
+    background: var(--gray-50);
+}
+
+.filter-tab.active {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.filter-tab.active i {
+    color: var(--gold);
+}
+
+.filter-tab-gold.active {
+    background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+    color: var(--black);
+    border-color: var(--gold);
+}
+
+.filter-tab-gold.active i {
+    color: var(--black);
+}
+
+.filter-tab-silver.active {
+    background: linear-gradient(135deg, var(--silver), var(--silver-dark));
+    color: var(--white);
+    border-color: var(--silver);
+}
+
+.filter-tab-silver.active i {
+    color: var(--white);
+}
+
 /* ---------- Forms ---------- */
 .form-section {
     max-width: 640px;
@@ -997,6 +1171,10 @@ select.form-control {
 
 .scan-result-header i {
     font-size: 22px;
+}
+
+.scan-result-header-silver {
+    background: linear-gradient(135deg, var(--silver), var(--silver-dark));
 }
 
 .scan-result-body {
@@ -1308,6 +1486,7 @@ select.form-control {
 
 /* ---------- Utility Classes ---------- */
 .text-gold { color: var(--gold); }
+.text-silver { color: var(--silver); }
 .text-muted { color: var(--gray-500); }
 .text-center { text-align: center; }
 .mb-0 { margin-bottom: 0; }
@@ -1329,6 +1508,9 @@ select.form-control {
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
     }
+    .stats-grid-3 {
+        grid-template-columns: repeat(2, 1fr);
+    }
     .action-grid {
         grid-template-columns: repeat(3, 1fr);
     }
@@ -1337,7 +1519,28 @@ select.form-control {
 @media (max-width: 768px) {
     .navbar-custom {
         padding: 0 16px;
-        height: 60px;
+        height: auto;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+    }
+
+    .navbar-left {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        width: 100%;
+    }
+
+    .navbar-nav {
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .navbar-nav a {
+        padding: 6px 10px;
+        font-size: 12px;
     }
 
     .brand {
@@ -1447,6 +1650,10 @@ select.form-control {
 
 @media (max-width: 480px) {
     .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid-3 {
         grid-template-columns: 1fr;
     }
 

@@ -20,6 +20,16 @@
             <span class="invoice-row-value">{{ item.rfid_id }}</span>
         </div>
         <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-circle-fill {% if item.metal_type == 'Gold' %}text-gold{% else %}text-silver{% endif %}"></i> Metal Type</span>
+            <span class="invoice-row-value">
+                {% if item.metal_type == "Gold" %}
+                <span class="badge badge-gold"><i class="bi bi-circle-fill"></i> Gold</span>
+                {% else %}
+                <span class="badge badge-silver"><i class="bi bi-circle-fill"></i> Silver</span>
+                {% endif %}
+            </span>
+        </div>
+        <div class="invoice-row">
             <span class="invoice-row-label"><i class="bi bi-speedometer"></i> Weight</span>
             <span class="invoice-row-value">{{ item.weight }} g</span>
         </div>

@@ -4,44 +4,73 @@
 
 <div class="hero-card animate-fade-in">
     <h1><i class="bi bi-gem"></i> Smart RFID Inventory System</h1>
-    <p>Manage Jewelry Inventory, RFID Tracking &amp; Billing</p>
+    <p>Manage Gold &amp; Silver Jewelry Inventory, RFID Tracking &amp; Billing</p>
     <div class="action-grid">
-        <a href="/add" class="action-card action-card-gold">
+        <a href="/inventory/gold" class="action-card action-card-gold">
+            <i class="bi bi-circle-fill"></i>
+            Gold Inventory
+        </a>
+        <a href="/inventory/silver" class="action-card action-card-silver">
+            <i class="bi bi-circle-fill"></i>
+            Silver Inventory
+        </a>
+        <a href="/add" class="action-card action-card-dark">
             <i class="bi bi-plus-circle"></i>
             Add Jewelry
-        </a>
-        <a href="/inventory" class="action-card action-card-dark">
-            <i class="bi bi-box-seam"></i>
-            Inventory
-        </a>
-        <a href="/scan" class="action-card action-card-green">
-            <i class="bi bi-upc-scan"></i>
-            RFID Scan
         </a>
     </div>
 </div>
 
-<div class="stats-grid mt-3 animate-fade-in-delay-2">
+<div class="stats-grid-3 animate-fade-in-delay-2">
+
+    <div class="stat-card stat-card-gold">
+        <i class="bi bi-circle-fill"></i>
+        <h3>Gold Items</h3>
+        <div class="stat-value">{{ gold_count }}</div>
+    </div>
+    <div class="stat-card stat-card-silver">
+        <i class="bi bi-circle-fill"></i>
+        <h3>Silver Items</h3>
+        <div class="stat-value">{{ silver_count }}</div>
+    </div>
     <div class="stat-card">
         <i class="bi bi-box-seam"></i>
         <h3>Total Items</h3>
         <div class="stat-value">{{ total_items }}</div>
+    </div>
+
+    <div class="stat-card stat-card-gold">
+        <i class="bi bi-speedometer"></i>
+        <h3>Gold Weight</h3>
+        <div class="stat-value">{{ gold_weight }} <span class="stat-unit">g</span></div>
+    </div>
+    <div class="stat-card stat-card-silver">
+        <i class="bi bi-speedometer"></i>
+        <h3>Silver Weight</h3>
+        <div class="stat-value">{{ silver_weight }} <span class="stat-unit">g</span></div>
     </div>
     <div class="stat-card">
         <i class="bi bi-speedometer"></i>
         <h3>Total Weight</h3>
         <div class="stat-value">{{ total_weight }} <span class="stat-unit">g</span></div>
     </div>
+
+    <div class="stat-card stat-card-gold">
+        <i class="bi bi-currency-rupee"></i>
+        <h3>Gold Value</h3>
+        <div class="stat-value">&#8377;{{ gold_value }}</div>
+    </div>
+    <div class="stat-card stat-card-silver">
+        <i class="bi bi-currency-rupee"></i>
+        <h3>Silver Value</h3>
+        <div class="stat-value">&#8377;{{ silver_value }}</div>
+    </div>
     <div class="stat-card">
         <i class="bi bi-currency-rupee"></i>
-        <h3>Inventory Value</h3>
+        <h3>Total Value</h3>
         <div class="stat-value">&#8377;{{ total_value }}</div>
     </div>
-    <div class="stat-card">
-        <i class="bi bi-check-circle"></i>
-        <h3>Available Stock</h3>
-        <div class="stat-value">{{ available_stock }}</div>
-    </div>
+
 </div>
 
 {% endblock %}
