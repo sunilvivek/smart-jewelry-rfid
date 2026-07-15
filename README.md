@@ -1,171 +1,131 @@
-# 💎 Smart RFID Jewelry Inventory System
+# Smart RFID Jewelry Inventory System
 
-A modern RFID-based Jewelry Inventory Management System developed using Flask, SQLite, Python, HTML, CSS, and Bootstrap.
+A professional ERP-style jewelry inventory management system built with Flask. Manages Gold and Silver inventory separately with RFID tracking, QR code generation, audit trails, and CSV export.
 
-This system helps jewelry stores efficiently manage ornaments, track inventory using RFID tags, generate QR codes automatically, search products instantly, and monitor stock availability in real time.
-
----
-
-## 📌 Project Overview
-
-Jewelry businesses often struggle with manual inventory tracking, misplaced ornaments, stock inconsistencies, and inefficient record management.
-
-The Smart RFID Jewelry Inventory System addresses these challenges by providing a centralized platform for managing jewelry inventory with RFID identification and QR code generation.
-
-Each ornament is assigned a unique RFID ID, allowing quick identification and tracking throughout its lifecycle.
+Live Demo: [https://smart-jewelry-rfid.onrender.com](https://smart-jewelry-rfid.onrender.com)
 
 ---
 
-## 🚀 Features
+## Features
 
-### Dashboard
+### ERP Dashboard
+- Fixed sidebar navigation with active page highlighting
+- Gold/Silver/Total stat cards (items, weight, value)
+- Quick-action cards for inventory and adding items
+- Responsive layout with collapsible sidebar on mobile
 
-* View total inventory count
-* Monitor total inventory weight
-* Track total inventory value
-* View available stock count
-* Clean and responsive dashboard interface
+### Gold & Silver Inventory
+- Separate tracking for Gold and Silver jewelry
+- Filter tabs (All / Gold / Silver) on inventory page
+- Metal type badges with color-coded indicators
+- `/inventory/gold` and `/inventory/silver` quick-filter routes
 
 ### Jewelry Management
+- Add new items with RFID ID, name, metal type, weight, purity, price
+- Edit existing records with pre-selected values
+- Delete items with confirmation dialog
+- Duplicate RFID detection
 
-* Add new jewelry items
-* Store RFID ID, ornament details, purity, weight, and price
-* Prevent duplicate RFID entries
-* Edit existing jewelry records
-* Delete jewelry records
+### RFID Scanning
+- Scan or enter RFID ID to look up item details
+- Displays QR code, metal type, weight, purity, price, status
+- "Item Not Found" feedback for invalid RFID lookups
 
-### RFID Tracking
+### QR Code System
+- Auto-generates QR codes when items are added
+- QR thumbnails in inventory table
+- Printable QR labels with metal type, purity, weight
+- Bulk QR code regeneration
 
-* Search inventory using RFID ID
-* Retrieve ornament information instantly
-* Simulates real RFID scanning workflow
+### Sales & Reporting
+- Sales history page with sold items and timestamps
+- CSV export with metal type filter support
+- Audit log tracking all system actions (add, edit, delete, sold, scan, export)
 
-### QR Code Generation
+### Security
+- CSRF protection on all forms (Flask-WTF)
+- Password hashing with Werkzeug (scrypt)
+- Password change functionality
+- Environment-based secret key (.env)
+- Session timeout (24 hours)
+- Secure file path handling
 
-* Automatically generates QR codes when jewelry is added
-* Stores QR codes in the system
-* Displays QR codes in inventory records
-* Supports QR tag printing
-
-### Inventory Monitoring
-
-* Mark items as Sold
-* Track Available and Sold status
-* Real-time inventory updates
-
-### Search Functionality
-
-* Search ornaments by RFID ID
-* Fast inventory lookup
-
-### QR Printing
-
-* Generate printable QR labels
-* Attach labels directly to ornaments
-* Simplifies inventory identification
-
----
-
-## 🖥️ System Workflow
-
-Add Jewelry
-↓
-Assign RFID ID
-↓
-Generate QR Code
-↓
-Store in Database
-↓
-Search / Scan RFID
-↓
-View Product Details
-↓
-Mark as Sold
-↓
-Inventory Updates Automatically
+### UX
+- Flash messages for all actions (success, error, warning, info)
+- Confirmation dialogs on destructive actions (delete, mark sold)
+- Input validation with error feedback
+- Custom 404/500 error pages
+- Pagination on inventory, sales, and audit pages
+- Print-optimized invoice layout
 
 ---
 
-## 🛠️ Technology Stack
+## Tech Stack
 
-### Backend
-
-* Python
-* Flask
-* SQLAlchemy
-* SQLite
-
-### Frontend
-
-* HTML5
-* CSS3
-* Bootstrap 5
-
-### Additional Libraries
-
-* qrcode
-* Pillow
+| Layer | Technology |
+|-------|-----------|
+| Backend | Python, Flask, SQLAlchemy |
+| Database | SQLite |
+| Auth | Flask-Login, Werkzeug (password hashing) |
+| Security | Flask-WTF (CSRF), python-dotenv |
+| Frontend | HTML5, CSS3, Bootstrap Icons |
+| QR Codes | qrcode, Pillow |
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
-```text
+```
 smart-jewelry-rfid/
-│
-├── app.py
-├── requirements.txt
+├── app.py                  # Flask application, routes, models
+├── requirements.txt        # Python dependencies
+├── .env                    # Environment variables (SECRET_KEY, FLASK_DEBUG)
+├── .gitignore
 │
 ├── static/
 │   ├── css/
-│   │   └── style.css
-│   │
-│   └── qrcodes/
+│   │   └── style.css       # Full theme: sidebar, ERP layout, components
+│   └── qrcodes/            # Auto-generated QR code images
 │
 ├── templates/
-│   ├── base.html
-│   ├── home.html
-│   ├── add_jewelry.html
-│   ├── inventory.html
-│   ├── scan.html
-│   ├── edit.html
-│   └── print_qr.html
+│   ├── base.html           # ERP layout: sidebar + topbar + content
+│   ├── login.html          # Login page (standalone)
+│   ├── home.html           # Dashboard with gold/silver/total stats
+│   ├── inventory.html      # Inventory table with filters, pagination
+│   ├── add_jewelry.html    # Add new item form
+│   ├── edit.html           # Edit item form
+│   ├── scan.html           # RFID scanner with lookup
+│   ├── bill.html           # Invoice with print button
+│   ├── print_qr.html       # Printable QR label (standalone)
+│   ├── sales.html          # Sales history with pagination
+│   ├── audit.html          # Audit log with pagination
+│   ├── change_password.html # Password change form
+│   └── error.html          # Custom 404/500 error page
 │
 └── instance/
-    └── jewelry.db
+    └── jewelry.db          # SQLite database (auto-created)
 ```
 
-## ⚙️ Installation Guide
+---
 
-### Clone Repository
+## Installation
+
+### Clone
 
 ```bash
 git clone https://github.com/sunilvivek/smart-jewelry-rfid.git
-```
-
-### Navigate to Project
-
-```bash
 cd smart-jewelry-rfid
 ```
 
-### Create Virtual Environment
+### Virtual Environment
 
 ```bash
 python -m venv venv
-```
 
-### Activate Virtual Environment
-
-#### macOS/Linux
-
-```bash
+# macOS/Linux
 source venv/bin/activate
-```
 
-#### Windows
-
-```bash
+# Windows
 venv\Scripts\activate
 ```
 
@@ -175,65 +135,119 @@ venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
-### Run Application
+### Configure Environment
+
+Create a `.env` file in the project root:
+
+```
+SECRET_KEY=your-secret-key-here
+FLASK_DEBUG=true
+FLASK_PORT=8000
+```
+
+### Run
 
 ```bash
 python app.py
 ```
 
-Open:
+Open [http://127.0.0.1:8000](http://127.0.0.1:8000)
 
-```text
-http://127.0.0.1:8000
-```
+**Default login:** `admin` / `balaji123` (change password after first login)
 
 ---
 
-## 📊 Database Fields
+## Database Schema
 
-| Field         | Description            |
-| ------------- | ---------------------- |
-| id            | Primary Key            |
-| rfid_id       | Unique RFID Identifier |
-| ornament_name | Ornament Name          |
-| weight        | Ornament Weight        |
-| purity        | Gold/Silver Purity     |
-| price         | Ornament Price         |
-| status        | Available / Sold       |
+### Jewelry Table
 
----
+| Column | Type | Description |
+|--------|------|-------------|
+| id | Integer | Primary key |
+| rfid_id | String(100) | Unique RFID identifier |
+| ornament_name | String(100) | Item name |
+| metal_type | String(20) | "Gold" or "Silver" |
+| weight | Float | Weight in grams |
+| purity | String(20) | e.g. 22K, 916, Silver 925 |
+| price | Float | Price in INR |
+| status | String(20) | "Available" or "Sold" |
+| created_at | DateTime | Timestamp when added |
+| updated_at | DateTime | Last modified timestamp |
 
-## 🔐 Future Enhancements
+### AuditLog Table
 
-* Real RFID Reader Integration (RC522)
-* Barcode Support
-* PDF Invoice Generation
-* Sales Management Module
-* Customer Management
-* User Authentication
-* Admin Dashboard
-* Inventory Analytics
-* Cloud Database Integration
-* Multi-Store Inventory Support
+| Column | Type | Description |
+|--------|------|-------------|
+| id | Integer | Primary key |
+| timestamp | DateTime | When the action occurred |
+| user | String(100) | Username who performed action |
+| action | String(50) | Action type (add_item, edit_item, delete_item, mark_sold, scan_item, export_csv, etc.) |
+| details | String(500) | Human-readable description |
+| item_id | Integer | Related jewelry item ID |
 
----
+### Admin Table
 
-## 🎯 Learning Outcomes
-
-This project helped in understanding:
-
-* Flask Web Development
-* CRUD Operations
-* Database Management using SQLite
-* RFID-based Inventory Concepts
-* QR Code Generation
-* Responsive UI Design
-* Python Backend Development
-* Full Stack Application Development
+| Column | Type | Description |
+|--------|------|-------------|
+| id | Integer | Primary key |
+| username | String(100) | Unique username |
+| password | String(255) | Hashed password (scrypt) |
 
 ---
 
-## 👨‍💻 Author
+## Routes
+
+| Route | Method | Description |
+|-------|--------|-------------|
+| `/login` | GET/POST | Admin login |
+| `/logout` | GET | Logout |
+| `/` | GET | Dashboard with stats |
+| `/inventory` | GET | Inventory with filters, search, pagination |
+| `/inventory/gold` | GET | Redirect to gold-filtered inventory |
+| `/inventory/silver` | GET | Redirect to silver-filtered inventory |
+| `/add` | GET/POST | Add new jewelry item |
+| `/edit/<id>` | GET/POST | Edit existing item |
+| `/delete/<id>` | POST | Delete item |
+| `/sold/<id>` | POST | Mark item as sold |
+| `/scan` | GET/POST | RFID scanner |
+| `/bill/<id>` | GET | Invoice page |
+| `/print_qr/<id>` | GET | Printable QR label |
+| `/generate_all_qr` | GET | Regenerate all QR codes |
+| `/export/csv` | GET | Download CSV export |
+| `/sales` | GET | Sales history |
+| `/audit` | GET | Audit log |
+| `/change-password` | GET/POST | Change admin password |
+
+---
+
+## Screenshots
+
+### ERP Sidebar Navigation
+- Fixed dark sidebar with gold accents
+- Section labels: Inventory, Actions, Reports, System
+- Active page indicator with gold left border
+- Collapsible on mobile with hamburger toggle
+
+### Dashboard
+- 3x3 grid of gold/silver/total stat cards
+- Quick-action cards for Gold Inventory, Silver Inventory, Add Jewelry
+
+### Inventory
+- Filter tabs: All / Gold / Silver
+- Metal type badges (gold gradient / silver gradient)
+- Search by RFID, name, metal, purity, status
+- Pagination (20 items per page)
+- CSV export button
+
+---
+
+## License
+
+This project is developed for educational and academic purposes.
+
+---
+
+## Author
 
 **Sunil Vivek**
 
@@ -241,10 +255,4 @@ B.Tech Computer Science Engineering (Cybersecurity)
 
 SRM Institute of Science and Technology
 
-GitHub: https://github.com/sunilvivek
-
----
-
-## 📜 License
-
-This project is developed for educational and academic purposes.
+GitHub: [https://github.com/sunilvivek](https://github.com/sunilvivek)
