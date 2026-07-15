@@ -9,8 +9,9 @@
 
 <div class="scanner-card animate-fade-in-delay-1">
     <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="scanner-input-group">
-            <input type="text" name="rfid_id" placeholder="Enter RFID ID..." required>
+            <input type="text" name="rfid_id" placeholder="Enter RFID ID..." required value="{{ scanned_rfid }}">
             <button type="submit" class="btn-gold">
                 <i class="bi bi-search"></i> Scan RFID
             </button>
@@ -57,7 +58,7 @@
                     <div class="scan-detail-row">
                         <i class="bi bi-currency-rupee"></i>
                         <span class="scan-detail-label">Price</span>
-                        <span class="scan-detail-value">&#8377;{{ item.price }}</span>
+                        <span class="scan-detail-value">&#8377;{{ "{:,.0f}".format(item.price) }}</span>
                     </div>
                     <div class="scan-detail-row">
                         <i class="bi bi-info-circle"></i>
@@ -70,9 +71,23 @@
                             {% endif %}
                         </span>
                     </div>
+                    {% if item.created_at %}
+                    <div class="scan-detail-row">
+                        <i class="bi bi-calendar"></i>
+                        <span class="scan-detail-label">Added</span>
+                        <span class="scan-detail-value">{{ item.created_at.strftime('%d %b %Y') }}</span>
+                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
+    </div>
+    {% elif not_found %}
+    <div class="scan-not-found animate-scale-in">
+        <i class="bi bi-search"></i>
+        <h3>Item Not Found</h3>
+        <p>No jewelry item found with RFID <strong>{{ scanned_rfid }}</strong>.</p>
+        <p class="text-muted">Please check the RFID ID and try again.</p>
     </div>
     {% endif %}
 

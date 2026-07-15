@@ -23,8 +23,13 @@
             {% endif %}
         </p>
     </div>
-    <div class="item-count">
-        <strong>{{ items|length }}</strong> item{{ 's' if items|length != 1 }} found
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <a href="/export/csv{% if active_filter %}?metal={{ active_filter }}{% endif %}" class="btn-outline-gold" title="Export to CSV">
+            <i class="bi bi-download"></i> Export CSV
+        </a>
+        <div class="item-count">
+            <strong>{{ pagination.total }}</strong> item{{ 's' if pagination.total != 1 }} found
+        </div>
     </div>
 </div>
 
@@ -50,7 +55,7 @@
         {% endif %}
         <div class="search-box">
             <i class="bi bi-search"></i>
-            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by RFID, name, metal, status...">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by RFID, name, metal, purity, status...">
         </div>
         <button type="submit" class="btn-gold">
             <i class="bi bi-search"></i> Search
@@ -118,13 +123,17 @@
                             <a href="/bill/{{ item.id }}" class="action-btn action-btn-bill" title="Bill">
                                 <i class="bi bi-receipt"></i>
                             </a>
+                            {% if item.status == "Available" %}
                             <form method="POST" action="/sold/{{ item.id }}" style="display:inline;">
-                                <button type="submit" class="action-btn action-btn-sold" title="Mark Sold">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn action-btn-sold" title="Mark Sold" onclick="return confirm('Mark {{ item.ornament_name }} as Sold? This cannot be undone.');">
                                     <i class="bi bi-check-lg"></i>
                                 </button>
                             </form>
+                            {% endif %}
                             <form method="POST" action="/delete/{{ item.id }}" style="display:inline;">
-                                <button type="submit" class="action-btn action-btn-delete" title="Delete" onclick="return confirm('Delete this jewelry item?');">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="action-btn action-btn-delete" title="Delete" onclick="return confirm('Delete {{ item.ornament_name }}? This cannot be undone.');">
                                     <i class="bi bi-trash3"></i>
                                 </button>
                             </form>
@@ -135,6 +144,34 @@
             </tbody>
         </table>
     </div>
+
+    {% if pagination.pages > 1 %}
+    <div class="pagination-container">
+        {% if pagination.has_prev %}
+        <a href="?page={{ pagination.prev_num }}{% if active_filter %}&metal={{ active_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-btn">
+            <i class="bi bi-chevron-left"></i> Prev
+        </a>
+        {% endif %}
+
+        <div class="pagination-pages">
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                <a href="?page={{ p }}{% if active_filter %}&metal={{ active_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pagination-page {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+                {% else %}
+                <span class="pagination-dots">&hellip;</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if pagination.has_next %}
+        <a href="?page={{ pagination.next_num }}{% if active_filter %}&metal={{ active_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-btn">
+            Next <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
     {% else %}
     <div class="table-empty">
         <i class="bi bi-inbox"></i>

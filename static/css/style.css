@@ -234,6 +234,219 @@ body {
     color: var(--gold);
 }
 
+/* ---------- Flash Messages ---------- */
+.flash-container {
+    margin-bottom: 24px;
+}
+
+.login-flash-container {
+    margin-bottom: 20px;
+}
+
+.flash {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 12px;
+    border: 1px solid transparent;
+}
+
+.flash-success {
+    background: var(--green-light);
+    color: var(--green);
+    border-color: rgba(45,138,78,0.2);
+}
+
+.flash-error {
+    background: var(--red-light);
+    color: var(--red);
+    border-color: rgba(192,57,43,0.2);
+}
+
+.flash-warning {
+    background: #fff3cd;
+    color: #856404;
+    border-color: rgba(133,100,4,0.2);
+}
+
+.flash-info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border-color: rgba(12,84,96,0.2);
+}
+
+.flash i:first-child {
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.flash span {
+    flex: 1;
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: inherit;
+    opacity: 0.6;
+    padding: 4px;
+    font-size: 14px;
+    transition: var(--transition);
+}
+
+.flash-close:hover {
+    opacity: 1;
+}
+
+/* ---------- Pagination ---------- */
+.pagination-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 32px;
+    padding: 20px 0;
+}
+
+.pagination-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 16px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--gray-600);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.pagination-btn:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+    color: var(--black);
+}
+
+.pagination-pages {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pagination-page {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--gray-600);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    transition: var(--transition);
+}
+
+.pagination-page:hover {
+    background: var(--gray-50);
+    border-color: var(--gray-300);
+    color: var(--black);
+}
+
+.pagination-page.active {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+}
+
+.pagination-dots {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    color: var(--gray-400);
+    font-size: 14px;
+}
+
+/* ---------- Navbar Toggle ---------- */
+.navbar-toggle {
+    display: none;
+    background: none;
+    border: 1px solid var(--gray-300);
+    border-radius: var(--radius-sm);
+    color: var(--black);
+    font-size: 20px;
+    padding: 6px 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.navbar-toggle:hover {
+    background: var(--gray-50);
+}
+
+/* ---------- Scan Not Found ---------- */
+.scan-not-found {
+    text-align: center;
+    padding: 48px 24px;
+    margin-top: 32px;
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+    border: 2px dashed var(--gray-300);
+}
+
+.scan-not-found i {
+    font-size: 48px;
+    color: var(--gray-300);
+    margin-bottom: 16px;
+    display: block;
+}
+
+.scan-not-found h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gray-600);
+    margin-bottom: 8px;
+}
+
+.scan-not-found p {
+    font-size: 14px;
+    color: var(--gray-500);
+    margin-bottom: 4px;
+}
+
+/* ---------- Navbar User ---------- */
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.navbar-user {
+    color: var(--gray-500);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: var(--transition);
+}
+
+.navbar-user:hover {
+    color: var(--black);
+}
+
 /* ---------- Page Headers ---------- */
 .page-header {
     margin-bottom: 28px;
@@ -1526,21 +1739,38 @@ select.form-control {
         padding-bottom: 12px;
     }
 
+    .navbar-toggle {
+        display: block;
+    }
+
     .navbar-left {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 8px;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
         width: 100%;
     }
 
     .navbar-nav {
-        flex-wrap: wrap;
-        gap: 2px;
+        display: none;
+        flex-direction: column;
+        gap: 0;
+        width: 100%;
+        padding-top: 8px;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .navbar-nav.open {
+        display: flex;
     }
 
     .navbar-nav a {
-        padding: 6px 10px;
-        font-size: 12px;
+        padding: 10px 0;
+        font-size: 14px;
+        border-bottom: 1px solid var(--gray-100);
+    }
+
+    .navbar-right {
+        display: none;
     }
 
     .brand {
@@ -1671,8 +1901,17 @@ select.form-control {
 
     .navbar-custom,
     .footer,
-    .btn-print {
+    .btn-print,
+    .btn-gold,
+    .btn-outline-gold,
+    .page-header,
+    .flash-container {
         display: none !important;
+    }
+
+    .main-container {
+        width: 100% !important;
+        padding: 0 !important;
     }
 
     .print-body {
@@ -1684,5 +1923,16 @@ select.form-control {
     .print-label {
         box-shadow: none;
         border: 1px solid #ddd;
+    }
+
+    .invoice-card {
+        box-shadow: none !important;
+        border: 2px solid var(--black) !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+    }
+
+    .invoice-header {
+        border-bottom: 2px solid var(--black) !important;
     }
 }

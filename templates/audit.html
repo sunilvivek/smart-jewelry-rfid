@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-journal-text"></i> Audit Log</h1>
+    <p>Track all actions performed in the system</p>
+</div>
+
+<div class="table-wrapper animate-fade-in-delay-1">
+    {% if logs %}
+    <div class="table-responsive">
+        <table>
+            <thead>
+                <tr>
+                    <th><i class="bi bi-clock"></i> Timestamp</th>
+                    <th><i class="bi bi-person"></i> User</th>
+                    <th><i class="bi bi-lightning"></i> Action</th>
+                    <th><i class="bi bi-info-circle"></i> Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td>{{ log.timestamp.strftime('%d %b %Y %H:%M:%S') }}</td>
+                    <td><strong>{{ log.user }}</strong></td>
+                    <td>
+                        <span class="badge {% if log.action in ('add_item', 'edit_item') %}badge-available{% elif log.action in ('delete_item', 'mark_sold') %}badge-sold{% else %}badge-gold{% endif %}">
+                            {{ log.action | replace('_', ' ') | title }}
+                        </span>
+                    </td>
+                    <td>{{ log.details or '-' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    {% if pagination.pages > 1 %}
+    <div class="pagination-container">
+        {% if pagination.has_prev %}
+        <a href="?page={{ pagination.prev_num }}" class="pagination-btn">
+            <i class="bi bi-chevron-left"></i> Prev
+        </a>
+        {% endif %}
+        <div class="pagination-pages">
+            {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+                {% if p %}
+                <a href="?page={{ p }}" class="pagination-page {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+                {% else %}
+                <span class="pagination-dots">&hellip;</span>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if pagination.has_next %}
+        <a href="?page={{ pagination.next_num }}" class="pagination-btn">
+            Next <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="table-empty">
+        <i class="bi bi-journal-text"></i>
+        <h3>No Audit Logs</h3>
+        <p>System actions will be logged here automatically.</p>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

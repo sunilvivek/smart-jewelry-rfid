@@ -58,17 +58,17 @@
     <div class="stat-card stat-card-gold">
         <i class="bi bi-currency-rupee"></i>
         <h3>Gold Value</h3>
-        <div class="stat-value">&#8377;{{ gold_value }}</div>
+        <div class="stat-value">&#8377;{{ "{:,.0f}".format(gold_value) }}</div>
     </div>
     <div class="stat-card stat-card-silver">
         <i class="bi bi-currency-rupee"></i>
         <h3>Silver Value</h3>
-        <div class="stat-value">&#8377;{{ silver_value }}</div>
+        <div class="stat-value">&#8377;{{ "{:,.0f}".format(silver_value) }}</div>
     </div>
     <div class="stat-card">
         <i class="bi bi-currency-rupee"></i>
         <h3>Total Value</h3>
-        <div class="stat-value">&#8377;{{ total_value }}</div>
+        <div class="stat-value">&#8377;{{ "{:,.0f}".format(total_value) }}</div>
     </div>
 
 </div>

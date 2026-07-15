@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Balaji Jewellers - RFID Inventory</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -21,20 +22,44 @@
                 <i class="bi bi-gem"></i>
                 BALAJI JEWELLERS
             </a>
+            <button class="navbar-toggle" onclick="document.querySelector('.navbar-nav').classList.toggle('open')" aria-label="Toggle navigation">
+                <i class="bi bi-list"></i>
+            </button>
             <ul class="navbar-nav">
-                <li><a href="/"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
-                <li><a href="/inventory/gold"><i class="bi bi-circle-fill" style="color:var(--gold);"></i> Gold</a></li>
-                <li><a href="/inventory/silver"><i class="bi bi-circle-fill" style="color:var(--silver);"></i> Silver</a></li>
-                <li><a href="/add"><i class="bi bi-plus-circle"></i> Add</a></li>
-                <li><a href="/scan"><i class="bi bi-upc-scan"></i> Scan</a></li>
+                <li><a href="/" class="{% if request.endpoint == 'home' %}active{% endif %}"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+                <li><a href="/inventory/gold" class="{% if request.args.get('metal') == 'Gold' %}active{% endif %}"><i class="bi bi-circle-fill" style="color:var(--gold);"></i> Gold</a></li>
+                <li><a href="/inventory/silver" class="{% if request.args.get('metal') == 'Silver' %}active{% endif %}"><i class="bi bi-circle-fill" style="color:var(--silver);"></i> Silver</a></li>
+                <li><a href="/add" class="{% if request.endpoint == 'add_jewelry' %}active{% endif %}"><i class="bi bi-plus-circle"></i> Add</a></li>
+                <li><a href="/scan" class="{% if request.endpoint == 'scan' %}active{% endif %}"><i class="bi bi-upc-scan"></i> Scan</a></li>
+                <li><a href="/sales" class="{% if request.endpoint == 'sales_history' %}active{% endif %}"><i class="bi bi-graph-up"></i> Sales</a></li>
+                <li><a href="/audit" class="{% if request.endpoint == 'audit_log' %}active{% endif %}"><i class="bi bi-journal-text"></i> Audit</a></li>
             </ul>
         </div>
-        <a href="/logout" class="logout-btn">
-            <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
+        <div class="navbar-right">
+            <a href="/change-password" class="navbar-user" title="Change Password">
+                <i class="bi bi-person-circle"></i> {{ current_user.username }}
+            </a>
+            <a href="/logout" class="logout-btn">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        </div>
     </nav>
 
     <div class="main-container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-container animate-fade-in">
+            {% for category, message in messages %}
+            <div class="flash flash-{{ category }}">
+                <i class="bi {% if category == 'success' %}bi-check-circle-fill{% elif category == 'error' %}bi-exclamation-circle-fill{% elif category == 'warning' %}bi-exclamation-triangle-fill{% else %}bi-info-circle-fill{% endif %}"></i>
+                <span>{{ message }}</span>
+                <button class="flash-close" onclick="this.parentElement.remove()"><i class="bi bi-x-lg"></i></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+
         {% block content %}
         {% endblock %}
     </div>
