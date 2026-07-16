@@ -10,7 +10,7 @@
 <div class="invoice-card animate-fade-in-delay-1">
     <div class="invoice-header">
         <h1><i class="bi bi-gem"></i> BALAJI JEWELLERS</h1>
-        <p>Invoice</p>
+        <p>{% if sale %}Invoice {{ sale.invoice_number }}{% else %}Item Invoice{% endif %}</p>
     </div>
     <div class="invoice-body">
         <div class="invoice-item-name">{{ item.ornament_name }}</div>
@@ -47,6 +47,23 @@
                 {% endif %}
             </span>
         </div>
+
+        {% if sale %}
+        <div style="border-top:2px dashed var(--gray-200);margin:16px 0;"></div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-person"></i> Sold To</span>
+            <span class="invoice-row-value">{{ sale.customer.full_name }}</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-telephone"></i> Phone</span>
+            <span class="invoice-row-value">{{ sale.customer.phone_number }}</span>
+        </div>
+        <div class="invoice-row">
+            <span class="invoice-row-label"><i class="bi bi-credit-card"></i> Payment</span>
+            <span class="invoice-row-value">{{ sale.payment_method }}</span>
+        </div>
+        {% endif %}
+
         {% if item.created_at %}
         <div class="invoice-row">
             <span class="invoice-row-label"><i class="bi bi-calendar"></i> Added On</span>
@@ -55,8 +72,8 @@
         {% endif %}
 
         <div class="invoice-total">
-            <span class="invoice-total-label"><i class="bi bi-currency-rupee"></i> Total Amount</span>
-            <span class="invoice-total-value">&#8377;{{ "{:,.0f}".format(item.price) }}</span>
+            <span class="invoice-row-label"><i class="bi bi-currency-rupee"></i> {% if sale %}Sale Amount{% else %}Listed Price{% endif %}</span>
+            <span class="invoice-total-value">&#8377;{{ "{:,.0f}".format(sale.sale_price if sale else item.price) }}</span>
         </div>
     </div>
     <div class="invoice-footer">

@@ -88,6 +88,37 @@ class Customer(db.Model):
     notes = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    sales = db.relationship("Sale", backref="customer", lazy=True)
+    repairs = db.relationship("Repair", backref="customer", lazy=True)
+
+
+class Sale(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    invoice_number = db.Column(db.String(20), unique=True, nullable=False)
+    jewelry_id = db.Column(db.Integer, db.ForeignKey("jewelry.id"), nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"), nullable=False)
+    sale_price = db.Column(db.Float, nullable=False)
+    payment_method = db.Column(db.String(30), default="Cash")
+    notes = db.Column(db.Text)
+    sale_date = db.Column(db.DateTime, default=datetime.utcnow)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    jewelry = db.relationship("Jewelry", backref="sales_record", lazy=True)
+
+
+class Repair(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    repair_id = db.Column(db.String(20), unique=True, nullable=False)
+    customer_id = db.Column(db.Integer, db.ForeignKey("customer.id"), nullable=False)
+    jewelry_name = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text)
+    estimated_cost = db.Column(db.Float)
+    actual_cost = db.Column(db.Float)
+    status = db.Column(db.String(20), default="Pending")
+    received_date = db.Column(db.DateTime, default=datetime.utcnow)
+    completed_date = db.Column(db.DateTime)
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 
 @login_manager.user_loader
@@ -371,7 +402,7 @@ def delete_item(id):
     return redirect("/inventory")
 
 
-@app.route("/sold/<int:id>", methods=["POST"])
+@app.route("/sold/<int:id>", methods=["GET", "POST"])
 @login_required
 def mark_sold(id):
     item = db.session.get(Jewelry, id)
@@ -379,13 +410,74 @@ def mark_sold(id):
         flash("Item not found.", "error")
         return redirect("/inventory")
 
-    item.status = "Sold"
-    item.updated_at = datetime.utcnow()
-    db.session.commit()
+    if item.status != "Available":
+        flash("This item is not available for sale.", "error")
+        return redirect("/inventory")
 
-    log_audit("mark_sold", f"Marked {item.ornament_name} (RFID:{item.rfid_id}) as Sold", id)
-    flash(f"{item.ornament_name} marked as sold.", "success")
-    return redirect("/inventory")
+    if request.method == "POST":
+        customer_id_str = request.form.get("customer_id", "").strip()
+        sale_price_str = request.form.get("sale_price", "").strip()
+        payment_method = request.form.get("payment_method", "Cash").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not customer_id_str:
+            flash("Please select a customer.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        try:
+            customer_id = int(customer_id_str)
+        except ValueError:
+            flash("Invalid customer selected.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        customer = db.session.get(Customer, customer_id)
+        if not customer:
+            flash("Customer not found.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        if not sale_price_str:
+            flash("Sale price is required.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        try:
+            sale_price = float(sale_price_str)
+        except ValueError:
+            flash("Sale price must be a valid number.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        if sale_price <= 0:
+            flash("Sale price must be a positive value.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("sell.html", item=item, customers=customers)
+
+        if payment_method not in ("Cash", "Card", "UPI", "Bank Transfer", "Other"):
+            payment_method = "Cash"
+
+        item.status = "Sold"
+        item.updated_at = datetime.utcnow()
+
+        sale = Sale(
+            invoice_number=generate_invoice_number(),
+            jewelry_id=item.id,
+            customer_id=customer.id,
+            sale_price=sale_price,
+            payment_method=payment_method,
+            notes=notes,
+        )
+        db.session.add(sale)
+        db.session.commit()
+
+        log_audit("mark_sold", f"Sold {item.ornament_name} (RFID:{item.rfid_id}) to {customer.full_name} for \u20b9{sale_price:,.0f} [{sale.invoice_number}]", id)
+        flash(f"{item.ornament_name} sold to {customer.full_name}. Invoice: {sale.invoice_number}", "success")
+        return redirect(f"/sales/{sale.id}")
+
+    customers = Customer.query.order_by(Customer.full_name).all()
+    return render_template("sell.html", item=item, customers=customers)
 
 
 @app.route("/edit/<int:id>", methods=["GET", "POST"])
@@ -475,16 +567,44 @@ def bill(id):
     if not item:
         flash("Item not found.", "error")
         return redirect("/inventory")
-    return render_template("bill.html", item=item)
+    sale = Sale.query.filter_by(jewelry_id=item.id).first()
+    return render_template("bill.html", item=item, sale=sale)
 
 
 @app.route("/sales")
 @login_required
 def sales_history():
+    search = request.args.get("search", "").strip()
     page = request.args.get("page", 1, type=int)
     per_page = 20
-    pagination = Jewelry.query.filter_by(status="Sold").order_by(Jewelry.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    return render_template("sales.html", items=pagination.items, pagination=pagination)
+
+    query = Sale.query
+
+    if search:
+        like_term = f"%{search}%"
+        query = query.join(Jewelry).join(Customer).filter(
+            db.or_(
+                Sale.invoice_number.like(like_term),
+                Jewelry.ornament_name.like(like_term),
+                Jewelry.rfid_id.like(like_term),
+                Customer.full_name.like(like_term),
+                Customer.phone_number.like(like_term),
+            )
+        )
+
+    query = query.order_by(Sale.sale_date.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    return render_template("sales.html", sales=pagination.items, pagination=pagination, search_query=search)
+
+
+@app.route("/sales/<int:id>")
+@login_required
+def sale_detail(id):
+    sale = db.session.get(Sale, id)
+    if not sale:
+        flash("Sale record not found.", "error")
+        return redirect("/sales")
+    return render_template("sale_detail.html", sale=sale)
 
 
 @app.route("/audit")
@@ -503,6 +623,24 @@ def generate_customer_id():
     else:
         num = 1
     return f"CUST{num:06d}"
+
+
+def generate_invoice_number():
+    last = Sale.query.order_by(Sale.id.desc()).first()
+    if last and last.invoice_number:
+        num = int(last.invoice_number.replace("INV", "")) + 1
+    else:
+        num = 1
+    return f"INV{num:06d}"
+
+
+def generate_repair_id():
+    last = Repair.query.order_by(Repair.id.desc()).first()
+    if last and last.repair_id:
+        num = int(last.repair_id.replace("REP", "")) + 1
+    else:
+        num = 1
+    return f"REP{num:06d}"
 
 
 @app.route("/customers")
@@ -594,7 +732,23 @@ def customer_profile(id):
     if not customer:
         flash("Customer not found.", "error")
         return redirect("/customers")
-    return render_template("customer_profile.html", customer=customer)
+
+    sales = Sale.query.filter_by(customer_id=customer.id).order_by(Sale.sale_date.desc()).all()
+    repairs = Repair.query.filter_by(customer_id=customer.id).order_by(Repair.created_at.desc()).all()
+
+    total_spent = sum(s.sale_price for s in sales)
+    total_repairs = len(repairs)
+    active_repairs = len([r for r in repairs if r.status in ("Pending", "In Progress")])
+
+    return render_template(
+        "customer_profile.html",
+        customer=customer,
+        sales=sales,
+        repairs=repairs,
+        total_spent=total_spent,
+        total_repairs=total_repairs,
+        active_repairs=active_repairs,
+    )
 
 
 @app.route("/customers/edit/<int:id>", methods=["GET", "POST"])
@@ -671,6 +825,200 @@ def delete_customer(id):
     return redirect("/customers")
 
 
+@app.route("/repairs")
+@login_required
+def repairs():
+    search = request.args.get("search", "").strip()
+    status_filter = request.args.get("status", "").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    query = Repair.query
+
+    if status_filter in ("Pending", "In Progress", "Completed"):
+        query = query.filter_by(status=status_filter)
+
+    if search:
+        like_term = f"%{search}%"
+        query = query.join(Customer).filter(
+            db.or_(
+                Repair.repair_id.like(like_term),
+                Repair.jewelry_name.like(like_term),
+                Customer.full_name.like(like_term),
+                Customer.phone_number.like(like_term),
+            )
+        )
+
+    query = query.order_by(Repair.created_at.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    pending_count = Repair.query.filter_by(status="Pending").count()
+    in_progress_count = Repair.query.filter_by(status="In Progress").count()
+    completed_count = Repair.query.filter_by(status="Completed").count()
+
+    return render_template(
+        "repairs.html",
+        repairs=pagination.items,
+        pagination=pagination,
+        search_query=search,
+        status_filter=status_filter,
+        pending_count=pending_count,
+        in_progress_count=in_progress_count,
+        completed_count=completed_count,
+    )
+
+
+@app.route("/repairs/add", methods=["GET", "POST"])
+@login_required
+def add_repair():
+    if request.method == "POST":
+        customer_id_str = request.form.get("customer_id", "").strip()
+        jewelry_name = request.form.get("jewelry_name", "").strip()
+        description = request.form.get("description", "").strip()
+        estimated_cost_str = request.form.get("estimated_cost", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not customer_id_str or not jewelry_name:
+            flash("Customer and Jewelry Name are required.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("add_repair.html", customers=customers)
+
+        try:
+            customer_id = int(customer_id_str)
+        except ValueError:
+            flash("Invalid customer selected.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("add_repair.html", customers=customers)
+
+        customer = db.session.get(Customer, customer_id)
+        if not customer:
+            flash("Customer not found.", "error")
+            customers = Customer.query.order_by(Customer.full_name).all()
+            return render_template("add_repair.html", customers=customers)
+
+        estimated_cost = None
+        if estimated_cost_str:
+            try:
+                estimated_cost = float(estimated_cost_str)
+                if estimated_cost < 0:
+                    flash("Estimated cost must be a positive value.", "error")
+                    customers = Customer.query.order_by(Customer.full_name).all()
+                    return render_template("add_repair.html", customers=customers)
+            except ValueError:
+                flash("Estimated cost must be a valid number.", "error")
+                customers = Customer.query.order_by(Customer.full_name).all()
+                return render_template("add_repair.html", customers=customers)
+
+        repair = Repair(
+            repair_id=generate_repair_id(),
+            customer_id=customer.id,
+            jewelry_name=jewelry_name,
+            description=description,
+            estimated_cost=estimated_cost,
+            notes=notes,
+        )
+        db.session.add(repair)
+        db.session.commit()
+
+        log_audit("add_repair", f"Added repair {repair.repair_id} for {customer.full_name} - {jewelry_name}")
+        flash(f"Repair {repair.repair_id} created for {customer.full_name}.", "success")
+        return redirect("/repairs")
+
+    customers = Customer.query.order_by(Customer.full_name).all()
+    return render_template("add_repair.html", customers=customers)
+
+
+@app.route("/repairs/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_repair(id):
+    repair = db.session.get(Repair, id)
+    if not repair:
+        flash("Repair not found.", "error")
+        return redirect("/repairs")
+
+    if request.method == "POST":
+        jewelry_name = request.form.get("jewelry_name", "").strip()
+        description = request.form.get("description", "").strip()
+        estimated_cost_str = request.form.get("estimated_cost", "").strip()
+        actual_cost_str = request.form.get("actual_cost", "").strip()
+        status = request.form.get("status", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not jewelry_name:
+            flash("Jewelry Name is required.", "error")
+            return render_template("edit_repair.html", repair=repair)
+
+        if status not in ("Pending", "In Progress", "Completed"):
+            flash("Invalid status.", "error")
+            return render_template("edit_repair.html", repair=repair)
+
+        estimated_cost = None
+        if estimated_cost_str:
+            try:
+                estimated_cost = float(estimated_cost_str)
+            except ValueError:
+                flash("Estimated cost must be a valid number.", "error")
+                return render_template("edit_repair.html", repair=repair)
+
+        actual_cost = None
+        if actual_cost_str:
+            try:
+                actual_cost = float(actual_cost_str)
+            except ValueError:
+                flash("Actual cost must be a valid number.", "error")
+                return render_template("edit_repair.html", repair=repair)
+
+        was_completed = repair.status != "Completed" and status == "Completed"
+
+        repair.jewelry_name = jewelry_name
+        repair.description = description
+        repair.estimated_cost = estimated_cost
+        repair.actual_cost = actual_cost
+        repair.status = status
+        repair.notes = notes
+        repair.updated_at = datetime.utcnow()
+
+        if was_completed:
+            repair.completed_date = datetime.utcnow()
+
+        db.session.commit()
+
+        log_audit("edit_repair", f"Updated repair {repair.repair_id} - status: {status}")
+        flash(f"Repair {repair.repair_id} updated successfully.", "success")
+        return redirect(f"/repairs/{id}")
+
+    return render_template("edit_repair.html", repair=repair)
+
+
+@app.route("/repairs/<int:id>")
+@login_required
+def repair_detail(id):
+    repair = db.session.get(Repair, id)
+    if not repair:
+        flash("Repair not found.", "error")
+        return redirect("/repairs")
+    return render_template("repair_detail.html", repair=repair)
+
+
+@app.route("/repairs/delete/<int:id>", methods=["POST"])
+@login_required
+def delete_repair(id):
+    repair = db.session.get(Repair, id)
+    if not repair:
+        flash("Repair not found.", "error")
+        return redirect("/repairs")
+
+    rid = repair.repair_id
+    customer_name = repair.customer.full_name
+
+    db.session.delete(repair)
+    db.session.commit()
+
+    log_audit("delete_repair", f"Deleted repair {rid} for {customer_name}")
+    flash(f"Repair {rid} deleted successfully.", "success")
+    return redirect("/repairs")
+
+
 @app.route("/change-password", methods=["GET", "POST"])
 @login_required
 def change_password():
@@ -728,6 +1076,12 @@ if __name__ == "__main__":
                 db.text("ALTER TABLE jewelry ADD COLUMN updated_at DATETIME")
             )
             db.session.commit()
+
+        for table in ["sale", "repair"]:
+            try:
+                db.session.execute(db.text(f"SELECT 1 FROM {table} LIMIT 1"))
+            except Exception:
+                pass
 
         if not Admin.query.filter_by(username="admin").first():
             admin = Admin(

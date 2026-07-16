@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-pencil-square"></i> Edit Repair</h1>
+    <p>Update details for {{ repair.repair_id }}</p>
+</div>
+
+<div class="card card-p-4 form-section-wide animate-fade-in-delay-1">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label><i class="bi bi-person"></i> Customer</label>
+            <input type="text" class="form-control" value="{{ repair.customer.full_name }} ({{ repair.customer.customer_id }})" disabled>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">Customer cannot be changed after creation.</div>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-gem"></i> Jewelry Name *</label>
+            <input type="text" class="form-control" name="jewelry_name" value="{{ repair.jewelry_name }}" required maxlength="100">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Description</label>
+            <textarea class="form-control" name="description" rows="3" maxlength="500">{{ repair.description or '' }}</textarea>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div class="form-group">
+                <label><i class="bi bi-currency-rupee"></i> Estimated Cost</label>
+                <input type="number" class="form-control" name="estimated_cost" value="{{ repair.estimated_cost if repair.estimated_cost is not none else '' }}" min="0" step="0.01">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-currency-rupee"></i> Actual Cost</label>
+                <input type="number" class="form-control" name="actual_cost" value="{{ repair.actual_cost if repair.actual_cost is not none else '' }}" min="0" step="0.01">
+            </div>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-info-circle"></i> Status *</label>
+            <select class="form-control" name="status" required>
+                <option value="Pending" {% if repair.status == "Pending" %}selected{% endif %}>Pending</option>
+                <option value="In Progress" {% if repair.status == "In Progress" %}selected{% endif %}>In Progress</option>
+                <option value="Completed" {% if repair.status == "Completed" %}selected{% endif %}>Completed</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Notes</label>
+            <textarea class="form-control" name="notes" rows="2" maxlength="500">{{ repair.notes or '' }}</textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Update Repair
+            </button>
+            <a href="/repairs/{{ repair.id }}" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

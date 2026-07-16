@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-plus-circle"></i> New Repair</h1>
+    <p>Record a new jewelry repair job</p>
+</div>
+
+<div class="card card-p-4 form-section-wide animate-fade-in-delay-1">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label><i class="bi bi-person"></i> Customer *</label>
+            {% if customers %}
+            <select class="form-control" name="customer_id" required>
+                <option value="">-- Select Customer --</option>
+                {% for c in customers %}
+                <option value="{{ c.id }}">{{ c.full_name }} ({{ c.customer_id }}) &mdash; {{ c.phone_number }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <div style="padding:12px;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:8px;text-align:center;">
+                <p style="color:var(--gray-400);margin:0;">No customers found.</p>
+                <a href="/customers/add" class="btn-gold" style="margin-top:8px;display:inline-flex;gap:6px;">
+                    <i class="bi bi-person-plus"></i> Add Customer First
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-gem"></i> Jewelry Name *</label>
+            <input type="text" class="form-control" name="jewelry_name" placeholder="e.g. Gold Chain, Silver Bangle" required maxlength="100">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Description</label>
+            <textarea class="form-control" name="description" rows="3" placeholder="Describe the repair work needed..." maxlength="500"></textarea>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-currency-rupee"></i> Estimated Cost</label>
+            <input type="number" class="form-control" name="estimated_cost" placeholder="e.g. 500" min="0" step="0.01">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Notes</label>
+            <textarea class="form-control" name="notes" rows="2" placeholder="Additional notes..." maxlength="500"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Create Repair
+            </button>
+            <a href="/repairs" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

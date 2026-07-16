@@ -1207,6 +1207,52 @@ tbody tr:nth-child(even):hover {
     border: 1px solid rgba(142,142,147,0.3);
 }
 
+/* ---------- Repair Status Badges ---------- */
+.badge-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid rgba(133,100,4,0.2);
+}
+
+.badge-progress {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: #cfe2ff;
+    color: #084298;
+    border: 1px solid rgba(8,66,152,0.2);
+}
+
+.badge-completed {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: var(--green-light);
+    color: var(--green);
+    border: 1px solid rgba(25,135,84,0.2);
+}
+
 /* ---------- Filter Tabs ---------- */
 .filter-tabs {
     display: flex;

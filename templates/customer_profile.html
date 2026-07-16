@@ -73,39 +73,147 @@
     </div>
 </div>
 
-<!-- Placeholder Cards -->
-<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));gap:20px;margin-top:32px;" class="animate-fade-in-delay-2">
+<!-- Stats Cards -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:20px;margin-top:32px;" class="animate-fade-in-delay-2">
 
-    <div class="stat-card" style="opacity:0.5;cursor:default;">
+    <div class="stat-card">
+        <i class="bi bi-currency-rupee"></i>
+        <h3>Total Spent</h3>
+        <div class="stat-value" style="color:var(--gold);">&#8377;{{ "{:,.0f}".format(total_spent) }}</div>
+    </div>
+
+    <div class="stat-card">
         <i class="bi bi-bag-check"></i>
-        <h3>Purchase History</h3>
-        <div class="stat-value" style="font-size:14px;color:var(--gray-400);">Coming Soon</div>
+        <h3>Purchases</h3>
+        <div class="stat-value">{{ sales|length }}</div>
     </div>
 
-    <div class="stat-card" style="opacity:0.5;cursor:default;">
-        <i class="bi bi-graph-up-arrow"></i>
-        <h3>Sales History</h3>
-        <div class="stat-value" style="font-size:14px;color:var(--gray-400);">Coming Soon</div>
+    <div class="stat-card">
+        <i class="bi bi-tools"></i>
+        <h3>Repairs</h3>
+        <div class="stat-value">{{ total_repairs }}</div>
     </div>
 
+    <div class="stat-card">
+        <i class="bi bi-hourglass-split"></i>
+        <h3>Active Repairs</h3>
+        <div class="stat-value" style="{% if active_repairs > 0 %}color:var(--warning);{% endif %}">{{ active_repairs }}</div>
+    </div>
+
+</div>
+
+<!-- Purchase History -->
+<div style="margin-top:32px;" class="animate-fade-in-delay-2">
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:16px;">
+        <i class="bi bi-bag-check" style="color:var(--gold);"></i> Purchase History
+    </h2>
+    {% if sales %}
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-receipt"></i> Invoice</th>
+                        <th><i class="bi bi-tag"></i> Item</th>
+                        <th><i class="bi bi-currency-rupee"></i> Price</th>
+                        <th><i class="bi bi-credit-card"></i> Payment</th>
+                        <th><i class="bi bi-calendar"></i> Date</th>
+                        <th><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for s in sales %}
+                    <tr>
+                        <td><strong>{{ s.invoice_number }}</strong></td>
+                        <td>{{ s.jewelry.ornament_name }}</td>
+                        <td>&#8377;{{ "{:,.0f}".format(s.sale_price) }}</td>
+                        <td>{{ s.payment_method }}</td>
+                        <td>{{ s.sale_date.strftime('%d %b %Y') if s.sale_date else '-' }}</td>
+                        <td>
+                            <a href="/sales/{{ s.id }}" class="action-btn action-btn-bill" title="View Invoice">
+                                <i class="bi bi-receipt"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:32px;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:12px;">
+        <i class="bi bi-bag" style="font-size:32px;color:var(--gray-300);"></i>
+        <p style="color:var(--gray-400);margin-top:8px;">No purchases yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Repair History -->
+<div style="margin-top:32px;" class="animate-fade-in-delay-2">
+    <h2 style="font-family:'Playfair Display',serif;font-size:20px;margin-bottom:16px;">
+        <i class="bi bi-tools" style="color:var(--gold);"></i> Repair History
+    </h2>
+    {% if repairs %}
+    <div class="table-wrapper">
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th><i class="bi bi-upc"></i> Repair ID</th>
+                        <th><i class="bi bi-gem"></i> Jewelry</th>
+                        <th><i class="bi bi-currency-rupee"></i> Cost</th>
+                        <th><i class="bi bi-info-circle"></i> Status</th>
+                        <th><i class="bi bi-calendar"></i> Received</th>
+                        <th><i class="bi bi-gear"></i> Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in repairs %}
+                    <tr>
+                        <td><strong>{{ r.repair_id }}</strong></td>
+                        <td>{{ r.jewelry_name }}</td>
+                        <td>{% if r.actual_cost is not none %}&#8377;{{ "{:,.0f}".format(r.actual_cost) }}{% elif r.estimated_cost is not none %}&#8377;{{ "{:,.0f}".format(r.estimated_cost) }} (est.){% else %}-{% endif %}</td>
+                        <td>
+                            {% if r.status == "Pending" %}
+                            <span class="badge badge-pending"><i class="bi bi-hourglass-split"></i> Pending</span>
+                            {% elif r.status == "In Progress" %}
+                            <span class="badge badge-progress"><i class="bi bi-gear"></i> In Progress</span>
+                            {% else %}
+                            <span class="badge badge-completed"><i class="bi bi-check-circle-fill"></i> Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ r.received_date.strftime('%d %b %Y') if r.received_date else '-' }}</td>
+                        <td>
+                            <a href="/repairs/{{ r.id }}" class="action-btn action-btn-bill" title="View">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:32px;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:12px;">
+        <i class="bi bi-tools" style="font-size:32px;color:var(--gray-300);"></i>
+        <p style="color:var(--gray-400);margin-top:8px;">No repair records yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Placeholder Cards -->
+<div style="display:grid;grid-template-columns:repeat(auto-fill, minmax(200px, 1fr));gap:20px;margin-top:32px;" class="animate-fade-in-delay-2">
     <div class="stat-card" style="opacity:0.5;cursor:default;">
         <i class="bi bi-receipt"></i>
         <h3>Invoices</h3>
         <div class="stat-value" style="font-size:14px;color:var(--gray-400);">Coming Soon</div>
     </div>
-
-    <div class="stat-card" style="opacity:0.5;cursor:default;">
-        <i class="bi bi-tools"></i>
-        <h3>Repairs</h3>
-        <div class="stat-value" style="font-size:14px;color:var(--gray-400);">Coming Soon</div>
-    </div>
-
     <div class="stat-card" style="opacity:0.5;cursor:default;">
         <i class="bi bi-award"></i>
         <h3>Loyalty Points</h3>
         <div class="stat-value" style="font-size:14px;color:var(--gray-400);">Coming Soon</div>
     </div>
-
 </div>
 
 {% endblock %}

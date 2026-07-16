@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-cart-check"></i> Sell Item</h1>
+    <p>Record sale details for {{ item.ornament_name }}</p>
+</div>
+
+<div class="card card-p-4 animate-fade-in-delay-1" style="max-width:700px;">
+    <div style="background:var(--gray-50);border:1px solid var(--gray-100);border-radius:12px;padding:16px 20px;margin-bottom:24px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+            <div style="width:44px;height:44px;border-radius:12px;background:var(--gold-light);display:flex;align-items:center;justify-content:center;">
+                <i class="bi bi-gem" style="color:var(--gold);"></i>
+            </div>
+            <div>
+                <strong>{{ item.ornament_name }}</strong>
+                <div style="font-size:13px;color:var(--gray-400);">{{ item.rfid_id }} &middot; {{ item.metal_type }} &middot; {{ item.weight }}g &middot; {{ item.purity }}</div>
+            </div>
+            <div style="margin-left:auto;text-align:right;">
+                <div style="font-size:13px;color:var(--gray-400);">Listed Price</div>
+                <strong style="color:var(--gold);font-size:18px;">&#8377;{{ "{:,.0f}".format(item.price) }}</strong>
+            </div>
+        </div>
+    </div>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label><i class="bi bi-person"></i> Customer *</label>
+            {% if customers %}
+            <select class="form-control" name="customer_id" required>
+                <option value="">-- Select Customer --</option>
+                {% for c in customers %}
+                <option value="{{ c.id }}">{{ c.full_name }} ({{ c.customer_id }}) &mdash; {{ c.phone_number }}</option>
+                {% endfor %}
+            </select>
+            {% else %}
+            <div style="padding:12px;background:var(--gray-50);border:1px solid var(--gray-100);border-radius:8px;text-align:center;">
+                <p style="color:var(--gray-400);margin:0;">No customers found.</p>
+                <a href="/customers/add" class="btn-gold" style="margin-top:8px;display:inline-flex;gap:6px;">
+                    <i class="bi bi-person-plus"></i> Add Customer First
+                </a>
+            </div>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-currency-rupee"></i> Sale Price *</label>
+            <input type="number" class="form-control" name="sale_price" value="{{ item.price }}" min="1" step="0.01" required>
+            <div style="font-size:12px;color:var(--gray-400);margin-top:4px;">Listed price: &#8377;{{ "{:,.0f}".format(item.price) }}</div>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-credit-card"></i> Payment Method</label>
+            <select class="form-control" name="payment_method">
+                <option value="Cash" selected>Cash</option>
+                <option value="Card">Card</option>
+                <option value="UPI">UPI</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+                <option value="Other">Other</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Notes</label>
+            <textarea class="form-control" name="notes" rows="2" placeholder="Optional sale notes..." maxlength="500"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Confirm Sale
+            </button>
+            <a href="/inventory" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

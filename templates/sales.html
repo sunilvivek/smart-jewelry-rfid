@@ -2,43 +2,71 @@
 
 {% block content %}
 
-<div class="page-header animate-fade-in">
-    <h1><i class="bi bi-graph-up"></i> Sales History</h1>
-    <p>Track all sold jewelry items with timestamps</p>
+<div class="page-header d-flex justify-content-between align-items-center flex-wrap gap-3 animate-fade-in">
+    <div>
+        <h1><i class="bi bi-graph-up"></i> Sales History</h1>
+        <p>Track all sold jewelry items with customer details</p>
+    </div>
+    <div class="item-count">
+        <strong>{{ pagination.total }}</strong> sale{{ 's' if pagination.total != 1 }} found
+    </div>
 </div>
 
-<div class="table-wrapper animate-fade-in-delay-1">
-    {% if items %}
+<div class="search-wrapper mb-4 animate-fade-in-delay-1">
+    <form method="GET" class="search-wrapper" style="width:100%;">
+        <div class="search-box">
+            <i class="bi bi-search"></i>
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by invoice, RFID, ornament, customer name...">
+        </div>
+        <button type="submit" class="btn-gold">
+            <i class="bi bi-search"></i> Search
+        </button>
+        {% if search_query %}
+        <a href="/sales" class="btn-outline-gold">
+            <i class="bi bi-x-lg"></i> Clear
+        </a>
+        {% endif %}
+    </form>
+</div>
+
+<div class="table-wrapper animate-fade-in-delay-2">
+    {% if sales %}
     <div class="table-responsive">
         <table>
             <thead>
                 <tr>
-                    <th><i class="bi bi-upc"></i> RFID</th>
+                    <th><i class="bi bi-receipt"></i> Invoice</th>
                     <th><i class="bi bi-tag"></i> Ornament</th>
                     <th><i class="bi bi-circle-fill"></i> Metal</th>
                     <th><i class="bi bi-speedometer"></i> Weight</th>
-                    <th><i class="bi bi-currency-rupee"></i> Price</th>
+                    <th><i class="bi bi-person"></i> Customer</th>
+                    <th><i class="bi bi-currency-rupee"></i> Sale Price</th>
+                    <th><i class="bi bi-credit-card"></i> Payment</th>
                     <th><i class="bi bi-calendar-check"></i> Sold On</th>
-                    <th><i class="bi bi-receipt"></i> Invoice</th>
+                    <th><i class="bi bi-gear"></i> Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for item in items %}
+                {% for s in sales %}
                 <tr>
-                    <td><strong>{{ item.rfid_id }}</strong></td>
-                    <td>{{ item.ornament_name }}</td>
+                    <td><strong>{{ s.invoice_number }}</strong></td>
+                    <td>{{ s.jewelry.ornament_name }}</td>
                     <td>
-                        {% if item.metal_type == "Gold" %}
+                        {% if s.jewelry.metal_type == "Gold" %}
                         <span class="badge badge-gold"><i class="bi bi-circle-fill"></i> Gold</span>
                         {% else %}
                         <span class="badge badge-silver"><i class="bi bi-circle-fill"></i> Silver</span>
                         {% endif %}
                     </td>
-                    <td>{{ item.weight }} g</td>
-                    <td>&#8377;{{ "{:,.0f}".format(item.price) }}</td>
-                    <td>{{ item.updated_at.strftime('%d %b %Y %H:%M') if item.updated_at else '-' }}</td>
+                    <td>{{ s.jewelry.weight }} g</td>
                     <td>
-                        <a href="/bill/{{ item.id }}" class="action-btn action-btn-bill" title="View Invoice">
+                        <a href="/customers/{{ s.customer.id }}" style="color:var(--gold);text-decoration:none;">{{ s.customer.full_name }}</a>
+                    </td>
+                    <td>&#8377;{{ "{:,.0f}".format(s.sale_price) }}</td>
+                    <td>{{ s.payment_method }}</td>
+                    <td>{{ s.sale_date.strftime('%d %b %Y %H:%M') if s.sale_date else '-' }}</td>
+                    <td>
+                        <a href="/sales/{{ s.id }}" class="action-btn action-btn-bill" title="View Invoice">
                             <i class="bi bi-receipt"></i>
                         </a>
                     </td>
@@ -51,21 +79,22 @@
     {% if pagination.pages > 1 %}
     <div class="pagination-container">
         {% if pagination.has_prev %}
-        <a href="?page={{ pagination.prev_num }}" class="pagination-btn">
+        <a href="?page={{ pagination.prev_num }}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-btn">
             <i class="bi bi-chevron-left"></i> Prev
         </a>
         {% endif %}
         <div class="pagination-pages">
             {% for p in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
                 {% if p %}
-                <a href="?page={{ p }}" class="pagination-page {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+                <a href="?page={{ p }}{% if search_query %}&search={{ search_query }}{% endif %}"
+                   class="pagination-page {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
                 {% else %}
                 <span class="pagination-dots">&hellip;</span>
                 {% endif %}
             {% endfor %}
         </div>
         {% if pagination.has_next %}
-        <a href="?page={{ pagination.next_num }}" class="pagination-btn">
+        <a href="?page={{ pagination.next_num }}{% if search_query %}&search={{ search_query }}{% endif %}" class="pagination-btn">
             Next <i class="bi bi-chevron-right"></i>
         </a>
         {% endif %}
@@ -76,7 +105,13 @@
     <div class="table-empty">
         <i class="bi bi-graph-up"></i>
         <h3>No Sales Yet</h3>
-        <p>Items marked as sold will appear here with timestamps.</p>
+        <p>
+            {% if search_query %}
+            No sales match your search. Try different keywords.
+            {% else %}
+            Items marked as sold will appear here with customer details.
+            {% endif %}
+        </p>
         <a href="/inventory" class="btn-gold" style="margin-top:20px;">
             <i class="bi bi-box-seam"></i> View Inventory
         </a>
