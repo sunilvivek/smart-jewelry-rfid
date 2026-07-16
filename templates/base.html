@@ -63,6 +63,14 @@
             </a>
 
             <div class="sidebar-divider"></div>
+            <div class="sidebar-label">CRM</div>
+
+            <a href="/customers" class="sidebar-link {% if request.endpoint and 'customer' in request.endpoint %}active{% endif %}">
+                <i class="bi bi-people"></i>
+                <span>Customers</span>
+            </a>
+
+            <div class="sidebar-divider"></div>
             <div class="sidebar-label">REPORTS</div>
 
             <a href="/sales" class="sidebar-link {% if request.endpoint == 'sales_history' %}active{% endif %}">

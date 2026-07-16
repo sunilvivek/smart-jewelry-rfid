@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="page-header animate-fade-in">
+    <h1><i class="bi bi-person-plus"></i> Add Customer</h1>
+    <p>Register a new customer in the system</p>
+</div>
+
+<div class="card card-p-4 form-section-wide animate-fade-in-delay-1">
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="form-group">
+            <label><i class="bi bi-person"></i> Full Name *</label>
+            <input type="text" class="form-control" name="full_name" placeholder="e.g. Ramesh Kumar" required maxlength="100">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-telephone"></i> Phone Number *</label>
+            <input type="tel" class="form-control" name="phone_number" placeholder="e.g. 9876543210" required maxlength="20" pattern="[0-9]{10,}">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-envelope"></i> Email</label>
+            <input type="email" class="form-control" name="email" placeholder="e.g. ramesh@email.com" maxlength="100">
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-house"></i> Address</label>
+            <input type="text" class="form-control" name="address" placeholder="e.g. 123, Jubilee Hills" maxlength="200">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;">
+            <div class="form-group">
+                <label><i class="bi bi-geo-alt"></i> City</label>
+                <input type="text" class="form-control" name="city" placeholder="e.g. Hyderabad" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-map"></i> State</label>
+                <input type="text" class="form-control" name="state" placeholder="e.g. Telangana" maxlength="50">
+            </div>
+            <div class="form-group">
+                <label><i class="bi bi-pin"></i> PIN Code</label>
+                <input type="text" class="form-control" name="pincode" placeholder="e.g. 500034" maxlength="10">
+            </div>
+        </div>
+        <div class="form-group">
+            <label><i class="bi bi-journal-text"></i> Notes</label>
+            <textarea class="form-control" name="notes" rows="3" placeholder="Any additional notes about this customer..." maxlength="500"></textarea>
+        </div>
+        <div class="form-actions">
+            <button type="submit" class="btn-gold">
+                <i class="bi bi-check-lg"></i> Save Customer
+            </button>
+            <a href="/customers" class="btn-outline-gold">
+                <i class="bi bi-arrow-left"></i> Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+{% endblock %}

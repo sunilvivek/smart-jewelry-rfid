@@ -75,6 +75,21 @@ class AuditLog(db.Model):
     item_id = db.Column(db.Integer, nullable=True)
 
 
+class Customer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    customer_id = db.Column(db.String(20), unique=True, nullable=False)
+    full_name = db.Column(db.String(100), nullable=False)
+    phone_number = db.Column(db.String(20), unique=True, nullable=False)
+    email = db.Column(db.String(100))
+    address = db.Column(db.String(200))
+    city = db.Column(db.String(50))
+    state = db.Column(db.String(50))
+    pincode = db.Column(db.String(10))
+    notes = db.Column(db.Text)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
 @login_manager.user_loader
 def load_user(user_id):
     return db.session.get(Admin, int(user_id))
@@ -479,6 +494,181 @@ def audit_log():
     per_page = 30
     pagination = AuditLog.query.order_by(AuditLog.timestamp.desc()).paginate(page=page, per_page=per_page, error_out=False)
     return render_template("audit.html", logs=pagination.items, pagination=pagination)
+
+
+def generate_customer_id():
+    last = Customer.query.order_by(Customer.id.desc()).first()
+    if last and last.customer_id:
+        num = int(last.customer_id.replace("CUST", "")) + 1
+    else:
+        num = 1
+    return f"CUST{num:06d}"
+
+
+@app.route("/customers")
+@login_required
+def customers():
+    search = request.args.get("search", "").strip()
+    page = request.args.get("page", 1, type=int)
+    per_page = 20
+
+    query = Customer.query
+
+    if search:
+        like_term = f"%{search}%"
+        query = query.filter(
+            db.or_(
+                Customer.customer_id.like(like_term),
+                Customer.full_name.like(like_term),
+                Customer.phone_number.like(like_term),
+                Customer.email.like(like_term),
+            )
+        )
+
+    query = query.order_by(Customer.id.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    return render_template(
+        "customers.html",
+        customers=pagination.items,
+        pagination=pagination,
+        search_query=search,
+    )
+
+
+@app.route("/customers/add", methods=["GET", "POST"])
+@login_required
+def add_customer():
+    if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
+        phone_number = request.form.get("phone_number", "").strip()
+        email = request.form.get("email", "").strip()
+        address = request.form.get("address", "").strip()
+        city = request.form.get("city", "").strip()
+        state = request.form.get("state", "").strip()
+        pincode = request.form.get("pincode", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not full_name or not phone_number:
+            flash("Full Name and Phone Number are required.", "error")
+            return render_template("add_customer.html")
+
+        if not phone_number.isdigit() or len(phone_number) < 10:
+            flash("Phone number must be at least 10 digits.", "error")
+            return render_template("add_customer.html")
+
+        if email and "@" not in email:
+            flash("Please enter a valid email address.", "error")
+            return render_template("add_customer.html")
+
+        existing = Customer.query.filter_by(phone_number=phone_number).first()
+        if existing:
+            flash(f"Phone number '{phone_number}' is already registered to {existing.full_name}.", "error")
+            return render_template("add_customer.html")
+
+        customer = Customer(
+            customer_id=generate_customer_id(),
+            full_name=full_name,
+            phone_number=phone_number,
+            email=email,
+            address=address,
+            city=city,
+            state=state,
+            pincode=pincode,
+            notes=notes,
+        )
+        db.session.add(customer)
+        db.session.commit()
+
+        log_audit("add_customer", f"Added customer {full_name} ({customer.customer_id})")
+        flash(f"Customer {full_name} added successfully.", "success")
+        return redirect("/customers")
+
+    return render_template("add_customer.html")
+
+
+@app.route("/customers/<int:id>")
+@login_required
+def customer_profile(id):
+    customer = db.session.get(Customer, id)
+    if not customer:
+        flash("Customer not found.", "error")
+        return redirect("/customers")
+    return render_template("customer_profile.html", customer=customer)
+
+
+@app.route("/customers/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+def edit_customer(id):
+    customer = db.session.get(Customer, id)
+    if not customer:
+        flash("Customer not found.", "error")
+        return redirect("/customers")
+
+    if request.method == "POST":
+        full_name = request.form.get("full_name", "").strip()
+        phone_number = request.form.get("phone_number", "").strip()
+        email = request.form.get("email", "").strip()
+        address = request.form.get("address", "").strip()
+        city = request.form.get("city", "").strip()
+        state = request.form.get("state", "").strip()
+        pincode = request.form.get("pincode", "").strip()
+        notes = request.form.get("notes", "").strip()
+
+        if not full_name or not phone_number:
+            flash("Full Name and Phone Number are required.", "error")
+            return render_template("edit_customer.html", customer=customer)
+
+        if not phone_number.isdigit() or len(phone_number) < 10:
+            flash("Phone number must be at least 10 digits.", "error")
+            return render_template("edit_customer.html", customer=customer)
+
+        if email and "@" not in email:
+            flash("Please enter a valid email address.", "error")
+            return render_template("edit_customer.html", customer=customer)
+
+        existing = Customer.query.filter(
+            Customer.phone_number == phone_number, Customer.id != id
+        ).first()
+        if existing:
+            flash(f"Phone number '{phone_number}' is already registered to {existing.full_name}.", "error")
+            return render_template("edit_customer.html", customer=customer)
+
+        customer.full_name = full_name
+        customer.phone_number = phone_number
+        customer.email = email
+        customer.address = address
+        customer.city = city
+        customer.state = state
+        customer.pincode = pincode
+        customer.notes = notes
+        customer.updated_at = datetime.utcnow()
+        db.session.commit()
+
+        log_audit("edit_customer", f"Updated customer {full_name} ({customer.customer_id})")
+        flash(f"Customer {full_name} updated successfully.", "success")
+        return redirect(f"/customers/{id}")
+
+    return render_template("edit_customer.html", customer=customer)
+
+
+@app.route("/customers/delete/<int:id>", methods=["POST"])
+@login_required
+def delete_customer(id):
+    customer = db.session.get(Customer, id)
+    if not customer:
+        flash("Customer not found.", "error")
+        return redirect("/customers")
+
+    name = customer.full_name
+    cid = customer.customer_id
+
+    db.session.delete(customer)
+    db.session.commit()
+
+    log_audit("delete_customer", f"Deleted customer {name} ({cid})")
+    flash(f"Customer {name} deleted successfully.", "success")
+    return redirect("/customers")
 
 
 @app.route("/change-password", methods=["GET", "POST"])
