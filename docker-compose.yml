@@ -1,0 +1,17 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - FLASK_CONFIG=production
+    volumes:
+      - app_data:/app/instance
+      - app_qr:/app/static/qrcodes
+    restart: unless-stopped
+
+volumes:
+  app_data:
+  app_qr:

@@ -1,62 +1,184 @@
 # Smart RFID Jewelry Inventory System
 
-A professional ERP-style jewelry inventory management system built with Flask. Manages Gold and Silver inventory separately with RFID tracking, QR code generation, audit trails, and CSV export.
+A production-ready, Dockerized Flask ERP for jewelry shop management. Tracks Gold & Silver inventory with RFID, QR codes, customer CRM, sales, repairs, invoices, and full audit trails.
 
 Live Demo: [https://smart-jewelry-rfid.onrender.com](https://smart-jewelry-rfid.onrender.com)
+
+---
+
+## Quick Start (Docker)
+
+```bash
+git clone https://github.com/sunilvivek/smart-jewelry-rfid.git
+cd smart-jewelry-rfid
+cp .env.example .env
+# Edit .env — set SECRET_KEY to a random string
+docker compose up --build
+```
+
+Open [http://localhost:8000](http://localhost:8000)
+
+**Default login:** `admin` / `balaji123`
+
+---
+
+## Quick Start (Local)
+
+```bash
+python -m venv venv
+source venv/bin/activate        # macOS/Linux
+pip install -r requirements.txt
+cp .env.example .env
+python app.py
+```
+
+---
+
+## Docker
+
+### Build & Run
+
+```bash
+docker compose up --build
+```
+
+### Background Mode
+
+```bash
+docker compose up -d
+docker compose logs -f          # watch logs
+docker compose down             # stop
+```
+
+### Rebuild After Changes
+
+```bash
+docker compose up --build --force-recreate
+```
+
+### Data Persistence
+
+SQLite database and QR codes are stored in Docker volumes (`app_data`, `app_qr`). Data survives container restarts.
+
+---
+
+## Environment Variables
+
+Copy `.env.example` to `.env` and configure:
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `SECRET_KEY` | (random) | Flask secret key — **change in production** |
+| `FLASK_CONFIG` | `development` | Config preset: `development`, `production`, `testing` |
+| `DATABASE_URL` | `sqlite:///jewelry.db` | Database URI (SQLite default, PostgreSQL-ready) |
+| `FLASK_DEBUG` | `false` | Enable Flask debug mode (dev only) |
+| `SESSION_COOKIE_SECURE` | `false` | Require HTTPS for cookies (set `true` in production) |
+| `SESSION_COOKIE_HTTPONLY` | `true` | Prevent JavaScript access to cookies |
+| `SESSION_COOKIE_SAMESITE` | `Lax` | CSRF cookie policy |
+
+---
+
+## Architecture
+
+```
+smart-jewelry-rfid/
+├── app.py              # Flask app factory, routes, models, helpers
+├── config.py           # Dev / Prod / Test configuration classes
+├── wsgi.py             # Gunicorn entry point
+├── requirements.txt    # Python dependencies
+├── Dockerfile          # Production Docker image
+├── docker-compose.yml  # Container orchestration
+├── .env.example        # Environment variable template
+├── .gitignore
+│
+├── static/
+│   ├── css/
+│   │   └── style.css   # Full ERP theme (sidebar, components, responsive)
+│   └── qrcodes/        # Auto-generated QR code images
+│
+├── templates/          # 23 Jinja2 templates
+│   ├── base.html       # ERP layout: sidebar + topbar + content
+│   ├── login.html
+│   ├── home.html       # Dashboard with gold/silver/total stats
+│   ├── inventory.html  # Inventory with filters, search, pagination
+│   ├── add_jewelry.html
+│   ├── edit.html
+│   ├── scan.html       # RFID scanner
+│   ├── sell.html       # Sale form (customer picker)
+│   ├── sale_detail.html
+│   ├── bill.html       # Printable invoice
+│   ├── print_qr.html
+│   ├── customers.html
+│   ├── add_customer.html
+│   ├── edit_customer.html
+│   ├── customer_profile.html
+│   ├── repairs.html
+│   ├── add_repair.html
+│   ├── edit_repair.html
+│   ├── repair_detail.html
+│   ├── sales.html      # Sales history
+│   ├── audit.html      # Audit log
+│   ├── change_password.html
+│   └── error.html      # 404/500
+│
+└── instance/
+    └── jewelry.db      # SQLite database (auto-created)
+```
 
 ---
 
 ## Features
 
 ### ERP Dashboard
-- Fixed sidebar navigation with active page highlighting
-- Gold/Silver/Total stat cards (items, weight, value)
-- Quick-action cards for inventory and adding items
-- Responsive layout with collapsible sidebar on mobile
+- Fixed sidebar with gold accents and section labels
+- Gold / Silver / Total stat cards (items, weight, value)
+- Quick-action navigation
 
-### Gold & Silver Inventory
-- Separate tracking for Gold and Silver jewelry
-- Filter tabs (All / Gold / Silver) on inventory page
-- Metal type badges with color-coded indicators
-- `/inventory/gold` and `/inventory/silver` quick-filter routes
-
-### Jewelry Management
-- Add new items with RFID ID, name, metal type, weight, purity, price
-- Edit existing records with pre-selected values
-- Delete items with confirmation dialog
+### Inventory Management
+- Separate Gold & Silver tracking with filter tabs
+- Add / Edit / Delete with validation
 - Duplicate RFID detection
+- CSV export with metal filter
+- Pagination (20 items/page)
 
-### RFID Scanning
-- Scan or enter RFID ID to look up item details
-- Displays QR code, metal type, weight, purity, price, status
-- "Item Not Found" feedback for invalid RFID lookups
+### RFID & QR Codes
+- RFID scanner with lookup
+- Auto-generated QR codes on item creation
+- Printable QR labels
+- Bulk QR regeneration
 
-### QR Code System
-- Auto-generates QR codes when items are added
-- QR thumbnails in inventory table
-- Printable QR labels with metal type, purity, weight
-- Bulk QR code regeneration
+### Customer CRM
+- Full customer database (name, phone, email, address)
+- Auto-generated customer IDs (CUST000001)
+- Search across all fields
+- Customer profile with purchase & repair history
 
-### Sales & Reporting
-- Sales history page with sold items and timestamps
-- CSV export with metal type filter support
-- Audit log tracking all system actions (add, edit, delete, sold, scan, export)
+### Sales & Invoices
+- Customer-linked sales with invoice numbers (INV000001)
+- Payment method tracking (Cash / Card / UPI / Bank Transfer)
+- Printable invoices with customer details
+- Sales history with search
+
+### Repairs
+- Repair tracking with status workflow (Pending → In Progress → Completed)
+- Customer association, estimated vs actual cost
+- Auto-completion timestamp
+- Status filter tabs with counts
 
 ### Security
-- CSRF protection on all forms (Flask-WTF)
-- Password hashing with Werkzeug (scrypt)
-- Password change functionality
-- Environment-based secret key (.env)
-- Session timeout (24 hours)
+- CSRF protection (Flask-WTF)
+- Password hashing (Werkzeug scrypt)
+- Environment-based secrets
+- Session timeout (24h)
 - Secure file path handling
+- Audit logging for all operations
 
 ### UX
-- Flash messages for all actions (success, error, warning, info)
-- Confirmation dialogs on destructive actions (delete, mark sold)
-- Input validation with error feedback
+- Flash messages (success / error / warning / info)
+- Confirmation dialogs on destructive actions
 - Custom 404/500 error pages
-- Pagination on inventory, sales, and audit pages
 - Print-optimized invoice layout
+- Responsive sidebar with mobile hamburger menu
 
 ---
 
@@ -64,134 +186,58 @@ Live Demo: [https://smart-jewelry-rfid.onrender.com](https://smart-jewelry-rfid.
 
 | Layer | Technology |
 |-------|-----------|
-| Backend | Python, Flask, SQLAlchemy |
-| Database | SQLite |
-| Auth | Flask-Login, Werkzeug (password hashing) |
+| Backend | Python 3.12, Flask, SQLAlchemy |
+| Database | SQLite (PostgreSQL-ready config) |
+| Auth | Flask-Login, Werkzeug password hashing |
 | Security | Flask-WTF (CSRF), python-dotenv |
 | Frontend | HTML5, CSS3, Bootstrap Icons |
 | QR Codes | qrcode, Pillow |
-
----
-
-## Project Structure
-
-```
-smart-jewelry-rfid/
-├── app.py                  # Flask application, routes, models
-├── requirements.txt        # Python dependencies
-├── .env                    # Environment variables (SECRET_KEY, FLASK_DEBUG)
-├── .gitignore
-│
-├── static/
-│   ├── css/
-│   │   └── style.css       # Full theme: sidebar, ERP layout, components
-│   └── qrcodes/            # Auto-generated QR code images
-│
-├── templates/
-│   ├── base.html           # ERP layout: sidebar + topbar + content
-│   ├── login.html          # Login page (standalone)
-│   ├── home.html           # Dashboard with gold/silver/total stats
-│   ├── inventory.html      # Inventory table with filters, pagination
-│   ├── add_jewelry.html    # Add new item form
-│   ├── edit.html           # Edit item form
-│   ├── scan.html           # RFID scanner with lookup
-│   ├── bill.html           # Invoice with print button
-│   ├── print_qr.html       # Printable QR label (standalone)
-│   ├── sales.html          # Sales history with pagination
-│   ├── audit.html          # Audit log with pagination
-│   ├── change_password.html # Password change form
-│   └── error.html          # Custom 404/500 error page
-│
-└── instance/
-    └── jewelry.db          # SQLite database (auto-created)
-```
-
----
-
-## Installation
-
-### Clone
-
-```bash
-git clone https://github.com/sunilvivek/smart-jewelry-rfid.git
-cd smart-jewelry-rfid
-```
-
-### Virtual Environment
-
-```bash
-python -m venv venv
-
-# macOS/Linux
-source venv/bin/activate
-
-# Windows
-venv\Scripts\activate
-```
-
-### Install Dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### Configure Environment
-
-Create a `.env` file in the project root:
-
-```
-SECRET_KEY=your-secret-key-here
-FLASK_DEBUG=true
-FLASK_PORT=8000
-```
-
-### Run
-
-```bash
-python app.py
-```
-
-Open [http://127.0.0.1:8000](http://127.0.0.1:8000)
-
-**Default login:** `admin` / `balaji123` (change password after first login)
+| Production | Gunicorn, Docker |
 
 ---
 
 ## Database Schema
 
-### Jewelry Table
+| Table | Key Columns |
+|-------|------------|
+| **Jewelry** | id, rfid_id, ornament_name, metal_type, weight, purity, price, status, created_at, updated_at |
+| **Customer** | id, customer_id, full_name, phone_number, email, address, city, state, pincode, notes |
+| **Sale** | id, invoice_number, jewelry_id (FK), customer_id (FK), sale_price, payment_method, sale_date |
+| **Repair** | id, repair_id, customer_id (FK), jewelry_name, description, estimated_cost, actual_cost, status, received_date, completed_date |
+| **AuditLog** | id, timestamp, user, action, details, item_id |
+| **Admin** | id, username, password |
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | Integer | Primary key |
-| rfid_id | String(100) | Unique RFID identifier |
-| ornament_name | String(100) | Item name |
-| metal_type | String(20) | "Gold" or "Silver" |
-| weight | Float | Weight in grams |
-| purity | String(20) | e.g. 22K, 916, Silver 925 |
-| price | Float | Price in INR |
-| status | String(20) | "Available" or "Sold" |
-| created_at | DateTime | Timestamp when added |
-| updated_at | DateTime | Last modified timestamp |
+---
 
-### AuditLog Table
+## Deployment
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | Integer | Primary key |
-| timestamp | DateTime | When the action occurred |
-| user | String(100) | Username who performed action |
-| action | String(50) | Action type (add_item, edit_item, delete_item, mark_sold, scan_item, export_csv, etc.) |
-| details | String(500) | Human-readable description |
-| item_id | Integer | Related jewelry item ID |
+### Render
+1. Connect GitHub repo
+2. Build command: `pip install -r requirements.txt`
+3. Start command: `gunicorn wsgi:app`
+4. Set env var: `FLASK_CONFIG=production`
 
-### Admin Table
+### Railway / DigitalOcean
+1. Connect repo
+2. Set `FLASK_CONFIG=production`
+3. Railway auto-detects Dockerfile
 
-| Column | Type | Description |
-|--------|------|-------------|
-| id | Integer | Primary key |
-| username | String(100) | Unique username |
-| password | String(255) | Hashed password (scrypt) |
+### VPS (Docker)
+```bash
+ssh your-server
+git clone https://github.com/sunilvivek/smart-jewelry-rfid.git
+cd smart-jewelry-rfid
+cp .env.example .env
+nano .env                    # set SECRET_KEY
+docker compose up -d --build
+```
+
+### PostgreSQL Migration
+Change `DATABASE_URL` in `.env`:
+```
+DATABASE_URL=postgresql://user:pass@localhost:5432/jewelry_db
+```
+Install `psycopg2-binary` and add to requirements.txt. No code changes needed.
 
 ---
 
@@ -201,43 +247,33 @@ Open [http://127.0.0.1:8000](http://127.0.0.1:8000)
 |-------|--------|-------------|
 | `/login` | GET/POST | Admin login |
 | `/logout` | GET | Logout |
-| `/` | GET | Dashboard with stats |
-| `/inventory` | GET | Inventory with filters, search, pagination |
-| `/inventory/gold` | GET | Redirect to gold-filtered inventory |
-| `/inventory/silver` | GET | Redirect to silver-filtered inventory |
-| `/add` | GET/POST | Add new jewelry item |
-| `/edit/<id>` | GET/POST | Edit existing item |
+| `/` | GET | Dashboard |
+| `/inventory` | GET | Inventory (search, filter, paginate) |
+| `/inventory/gold` | GET | Gold-filtered inventory |
+| `/inventory/silver` | GET | Silver-filtered inventory |
+| `/add` | GET/POST | Add jewelry item |
+| `/edit/<id>` | GET/POST | Edit item |
 | `/delete/<id>` | POST | Delete item |
-| `/sold/<id>` | POST | Mark item as sold |
+| `/sold/<id>` | GET/POST | Sell item (customer picker + sale form) |
 | `/scan` | GET/POST | RFID scanner |
-| `/bill/<id>` | GET | Invoice page |
+| `/bill/<id>` | GET | Invoice |
 | `/print_qr/<id>` | GET | Printable QR label |
 | `/generate_all_qr` | GET | Regenerate all QR codes |
-| `/export/csv` | GET | Download CSV export |
+| `/export/csv` | GET | CSV export |
 | `/sales` | GET | Sales history |
+| `/sales/<id>` | GET | Sale detail / invoice |
+| `/customers` | GET | Customer list |
+| `/customers/add` | GET/POST | Add customer |
+| `/customers/<id>` | GET | Customer profile |
+| `/customers/edit/<id>` | GET/POST | Edit customer |
+| `/customers/delete/<id>` | POST | Delete customer |
+| `/repairs` | GET | Repair list |
+| `/repairs/add` | GET/POST | Add repair |
+| `/repairs/<id>` | GET | Repair detail |
+| `/repairs/edit/<id>` | GET/POST | Edit repair |
+| `/repairs/delete/<id>` | POST | Delete repair |
 | `/audit` | GET | Audit log |
 | `/change-password` | GET/POST | Change admin password |
-
----
-
-## Screenshots
-
-### ERP Sidebar Navigation
-- Fixed dark sidebar with gold accents
-- Section labels: Inventory, Actions, Reports, System
-- Active page indicator with gold left border
-- Collapsible on mobile with hamburger toggle
-
-### Dashboard
-- 3x3 grid of gold/silver/total stat cards
-- Quick-action cards for Gold Inventory, Silver Inventory, Add Jewelry
-
-### Inventory
-- Filter tabs: All / Gold / Silver
-- Metal type badges (gold gradient / silver gradient)
-- Search by RFID, name, metal, purity, status
-- Pagination (20 items per page)
-- CSV export button
 
 ---
 
