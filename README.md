@@ -211,11 +211,28 @@ smart-jewelry-rfid/
 
 ## Deployment
 
-### Render
-1. Connect GitHub repo
+### Render (Blueprint — recommended)
+1. Go to [render.com](https://render.com) → Sign in with GitHub
+2. Click **"New +"** → **"Blueprint"**
+3. Connect repo: `sunilvivek/smart-jewelry-rfid`
+4. Render detects `render.yaml` and auto-creates:
+   - **Web service** (Python 3.12 + Gunicorn)
+   - **PostgreSQL database** (free tier)
+   - `SECRET_KEY` auto-generated, `DATABASE_URL` auto-linked
+5. Click **Deploy** — build takes ~2 minutes
+6. Once live, click the service URL (e.g. `https://smart-jewelry-rfid.onrender.com`)
+
+**Note:** Free tier spins down after 15 min idle. First request after idle takes ~30s (cold start).
+
+### Render (Manual)
+1. **New Web Service** → Connect GitHub repo
 2. Build command: `pip install -r requirements.txt`
 3. Start command: `gunicorn wsgi:app`
-4. Set env var: `FLASK_CONFIG=production`
+4. Set env vars:
+   - `FLASK_CONFIG=production`
+   - `SECRET_KEY=<random string>`
+   - `DATABASE_URL=<your PostgreSQL connection string>`
+5. **New PostgreSQL** database → Copy connection string → Set as `DATABASE_URL`
 
 ### Railway / DigitalOcean
 1. Connect repo
