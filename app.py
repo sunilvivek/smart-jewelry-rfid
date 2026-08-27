@@ -26,47 +26,51 @@ login_manager = LoginManager()
 
 
 def init_db(app):
-    with app.app_context():
-        db.create_all()
+    import fcntl
+    import os
+
+    lock_path = os.path.join(app.instance_path, ".init_lock")
+    os.makedirs(os.path.dirname(lock_path), exist_ok=True)
+
+    with open(lock_path, "a") as lock_file:
+        try:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except (IOError, OSError):
+            return
 
         try:
-            db.session.execute(db.text("SELECT metal_type FROM jewelry LIMIT 1"))
-        except Exception:
-            db.session.execute(
-                db.text("ALTER TABLE jewelry ADD COLUMN metal_type VARCHAR(20) DEFAULT 'Gold'")
-            )
-            db.session.commit()
+            with app.app_context():
+                db.create_all()
 
-        try:
-            db.session.execute(db.text("SELECT created_at FROM jewelry LIMIT 1"))
-        except Exception:
-            db.session.execute(
-                db.text("ALTER TABLE jewelry ADD COLUMN created_at DATETIME")
-            )
-            db.session.commit()
+                inspector = db.inspect(db.engine)
+                columns = {col["name"] for col in inspector.get_columns("jewelry")}
 
-        try:
-            db.session.execute(db.text("SELECT updated_at FROM jewelry LIMIT 1"))
-        except Exception:
-            db.session.execute(
-                db.text("ALTER TABLE jewelry ADD COLUMN updated_at DATETIME")
-            )
-            db.session.commit()
+                if "metal_type" not in columns:
+                    db.session.execute(db.text("ALTER TABLE jewelry ADD COLUMN metal_type VARCHAR(20) DEFAULT 'Gold'"))
+                    db.session.commit()
 
-        for table in ["sale", "repair"]:
-            try:
-                db.session.execute(db.text(f"SELECT 1 FROM {table} LIMIT 1"))
-            except Exception:
-                pass
+                if "created_at" not in columns:
+                    db.session.execute(db.text("ALTER TABLE jewelry ADD COLUMN created_at DATETIME"))
+                    db.session.commit()
 
-        if not Admin.query.filter_by(username="admin").first():
-            admin = Admin(
-                username="admin",
-                password=generate_password_hash("balaji123"),
-            )
-            db.session.add(admin)
-            db.session.commit()
-            print("Default admin created (admin / balaji123)")
+                if "updated_at" not in columns:
+                    db.session.execute(db.text("ALTER TABLE jewelry ADD COLUMN updated_at DATETIME"))
+                    db.session.commit()
+
+                for table in ["sale", "repair"]:
+                    if not inspector.has_table(table):
+                        pass
+
+                if not Admin.query.filter_by(username="admin").first():
+                    admin = Admin(
+                        username="admin",
+                        password=generate_password_hash("balaji123"),
+                    )
+                    db.session.add(admin)
+                    db.session.commit()
+                    print("Default admin created (admin / balaji123)")
+        finally:
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
 
 class Admin(UserMixin, db.Model):
@@ -235,6 +239,10 @@ def create_app(config_name="development"):
         logout_user()
         flash("You have been logged out.", "info")
         return redirect("/login")
+
+    @app.route("/healthz")
+    def healthz():
+        return {"status": "ok"}, 200
 
     @app.route("/")
     @login_required
